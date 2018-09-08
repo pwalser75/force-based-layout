@@ -9,7 +9,7 @@ package ch.frostnova.force.based.layout.geom;
 public interface Shape {
 
     /**
-     * Get the current location of the shape
+     * Current location of the shape
      *
      * @return location, never null
      */
@@ -23,15 +23,14 @@ public interface Shape {
     void setLocation(Point newLocation);
 
     /**
-     * Get the size of the shape
+     * Size of the shape
      *
      * @return size, never null
      */
     Dimension getSize();
 
-
     /**
-     * Returns the center of the shape
+     * Center of the shape
      *
      * @return center
      */
@@ -39,18 +38,38 @@ public interface Shape {
         return new Point(getLocation().getX() + getSize().getWidth() / 2, getLocation().getY() + getSize().getHeight() / 2);
     }
 
+    /**
+     * Upper left corner of the shape
+     *
+     * @return point
+     */
     default Point getP1() {
         return new Point(getLocation().getX(), getLocation().getY());
     }
 
+    /**
+     * Upper right corner of the shape
+     *
+     * @return point
+     */
     default Point getP2() {
         return new Point(getLocation().getX() + getSize().getWidth(), getLocation().getY());
     }
 
+    /**
+     * Lower left corner of the shape
+     *
+     * @return point
+     */
     default Point getP3() {
         return new Point(getLocation().getX(), getLocation().getY() + getSize().getHeight());
     }
 
+    /**
+     * Lower right corner of the shape
+     *
+     * @return point
+     */
     default Point getP4() {
         return new Point(getLocation().getX() + getSize().getWidth(), getLocation().getY() + getSize().getHeight());
     }

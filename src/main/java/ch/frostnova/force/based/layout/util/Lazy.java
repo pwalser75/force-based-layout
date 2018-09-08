@@ -45,6 +45,11 @@ public class Lazy<T> {
         this.supplier = Check.required(supplier, "supplier");
     }
 
+    /**
+     * Get the (lazy evaulated) value
+     *
+     * @return value
+     */
     public T get() {
         if (!evaluated) {
             value = supplier.get();
