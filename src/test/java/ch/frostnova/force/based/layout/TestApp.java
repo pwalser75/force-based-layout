@@ -1,10 +1,13 @@
-package ch.frostnova.force.based.layout.render;
+package ch.frostnova.force.based.layout;
 
 import ch.frostnova.force.based.layout.model.BaseShape;
 import ch.frostnova.force.based.layout.model.Scene;
+import ch.frostnova.force.based.layout.model.Shape;
+import ch.frostnova.force.based.layout.render.SwingSceneRenderer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Test app (Swing UI).
@@ -22,12 +25,13 @@ public class TestApp extends JFrame {
 
     private TestApp() {
 
-        scene = new Scene();
-        scene.add(new BaseShape(0, 0, 100, 100));
-        scene.add(new BaseShape(150, 50, 200, 120));
-        scene.add(new BaseShape(50, 150, 200, 180));
-
         setTitle("Force Based Layout Test");
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        setSize(new Dimension(screenSize.width / 2, screenSize.height * 2 / 3));
+        setMinimumSize(new Dimension(400, 400));
+        centerOnScreen();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel main = new JPanel();
         setContentPane(main);
@@ -35,12 +39,13 @@ public class TestApp extends JFrame {
 
         SwingSceneRenderer sceneRenderer = new SwingSceneRenderer();
         main.add(sceneRenderer, BorderLayout.CENTER);
+
+        scene = new Scene();
+        for (int i = 0; i < 20; i++) {
+            scene.add(randomShape(getSize()));
+        }
         sceneRenderer.setScene(scene);
 
-        pack();
-        setMinimumSize(new Dimension(400, 400));
-        centerOnScreen();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }
 
@@ -49,5 +54,19 @@ public class TestApp extends JFrame {
         int x = (int) ((dimension.getWidth() - getWidth()) / 2);
         int y = (int) ((dimension.getHeight() - getHeight()) / 2);
         setLocation(x, y);
+    }
+
+    private Shape randomShape(Dimension area) {
+
+        int w = rnd(10, 200);
+        int h = rnd(10, 200);
+        int x = rnd(0, area.width - w);
+        int y = rnd(0, area.height - h);
+        return new BaseShape(x, y, w, h);
+
+    }
+
+    private int rnd(int min, int bound) {
+        return ThreadLocalRandom.current().nextInt(min, bound);
     }
 }

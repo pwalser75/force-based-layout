@@ -2,10 +2,10 @@ package ch.frostnova.force.based.layout.model;
 
 import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.geom.Point;
-import ch.frostnova.force.based.layout.geom.Shape;
 import ch.frostnova.util.check.Check;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -39,6 +39,25 @@ public class Scene {
 
     public Stream<Shape> shapes() {
         return shapes.stream();
+    }
+
+    public Optional<Shape> getShapeAt(double x, double y) {
+
+        Point p = new Point(x, y);
+
+        Shape nearest = null;
+        double minDistance = 0;
+        for (Shape shape : shapes) {
+            if (shape.getBounds().contains(p)) {
+                double distance = p.distance(shape.getBounds().getCenter()).length();
+                if (nearest == null || distance < minDistance) {
+                    nearest = shape;
+                    minDistance = distance;
+                }
+            }
+
+        }
+        return Optional.ofNullable(nearest);
     }
 
     /**

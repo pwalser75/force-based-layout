@@ -2,12 +2,12 @@ package ch.frostnova.force.based.layout.model;
 
 import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.geom.Point;
-import ch.frostnova.force.based.layout.geom.Shape;
+import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.force.based.layout.util.Lazy;
 import ch.frostnova.util.check.Check;
 
 /**
- * Basic shape implementation.
+ * Basic shape implementation
  *
  * @author pwalser
  * @since 08.09.2018.
@@ -15,9 +15,9 @@ import ch.frostnova.util.check.Check;
 public class BaseShape implements Shape {
 
     private Point location;
-    private final Dimension size;
+    private Dimension size;
 
-    private final Lazy<Point> p1, p2, p3, p4, center;
+    private final Lazy<Rectangle> bounds;
 
     public BaseShape(double width, double height) {
         this(new Dimension(width, height));
@@ -34,11 +34,7 @@ public class BaseShape implements Shape {
     public BaseShape(Point location, Dimension size) {
         this.location = Check.required(location, "location");
         this.size = Check.required(size, "size");
-        p1 = new Lazy<>(() -> Shape.super.getP1());
-        p2 = new Lazy<>(() -> Shape.super.getP2());
-        p3 = new Lazy<>(() -> Shape.super.getP3());
-        p4 = new Lazy<>(() -> Shape.super.getP4());
-        center = new Lazy<>(() -> Shape.super.getCenter());
+        bounds = new Lazy<>(() -> Shape.super.getBounds());
     }
 
     @Override
@@ -47,47 +43,28 @@ public class BaseShape implements Shape {
     }
 
     @Override
-    public void setLocation(Point location) {
-        this.location = location;
-        center.reset();
-        p1.reset();
-        p2.reset();
-        p3.reset();
-        p4.reset();
-    }
-
-    @Override
     public Dimension getSize() {
         return size;
     }
 
     @Override
-    public Point getCenter() {
-        return center.get();
+    public void setLocation(Point newLocation) {
+        location = Check.required(newLocation, "newLocation");
+        bounds.reset();
+    }
+
+    public void setSize(Dimension size) {
+        this.size = Check.required(size, "size");
+        bounds.reset();
     }
 
     @Override
-    public Point getP1() {
-        return p1.get();
-    }
-
-    @Override
-    public Point getP2() {
-        return p2.get();
-    }
-
-    @Override
-    public Point getP3() {
-        return p3.get();
-    }
-
-    @Override
-    public Point getP4() {
-        return p4.get();
+    public Rectangle getBounds() {
+        return bounds.get();
     }
 
     @Override
     public String toString() {
-        return location + ", " + size;
+        return getBounds().toString();
     }
 }

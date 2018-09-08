@@ -1,12 +1,16 @@
 package ch.frostnova.force.based.layout.render;
 
 import ch.frostnova.force.based.layout.model.Scene;
+import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.force.based.layout.render.strategy.DefaultRenderStrategy;
 import ch.frostnova.force.based.layout.render.strategy.ShapeRenderStrategy;
 import ch.frostnova.util.check.Check;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -21,6 +25,41 @@ public class SwingSceneRenderer extends JPanel {
     private ShapeRenderStrategy renderStrategy = new DefaultRenderStrategy();
 
     private Scene scene = new Scene();
+
+    private Shape selectedShape;
+    private Point lastMousePosition;
+
+    public SwingSceneRenderer() {
+
+        addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                selectedShape = null;
+                lastMousePosition = null;
+            }
+        });
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                Point mousePosition = new Point(e.getPoint());
+
+                if (lastMousePosition == null) {
+                    selectedShape = scene.getShapeAt(e.getX(), e.getY()).orElse(null);
+                    lastMousePosition = e.getPoint();
+                } else {
+                    Point delta = new Point(mousePosition.x - lastMousePosition.x, mousePosition.y - lastMousePosition.y);
+                    if (selectedShape != null) {
+                        ch.frostnova.force.based.layout.geom.Point location = selectedShape.getLocation();
+                        selectedShape.setLocation(new ch.frostnova.force.based.layout.geom.Point(location.getX() + delta.getX(), location.getY() + delta.getY()));
+                        repaint();
+                    }
+                    lastMousePosition = mousePosition;
+                }
+            }
+        });
+    }
 
     public Scene getScene() {
         return scene;

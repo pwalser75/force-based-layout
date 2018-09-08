@@ -1,6 +1,6 @@
 package ch.frostnova.force.based.layout.render.strategy;
 
-import ch.frostnova.force.based.layout.geom.Shape;
+import ch.frostnova.force.based.layout.model.Shape;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;

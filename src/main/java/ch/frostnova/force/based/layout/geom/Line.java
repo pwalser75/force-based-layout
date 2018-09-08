@@ -3,7 +3,6 @@ package ch.frostnova.force.based.layout.geom;
 import ch.frostnova.util.check.Check;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * A line, given by two points.
@@ -27,35 +26,6 @@ public class Line {
 
     public final Point getDestination() {
         return destination;
-    }
-
-    public Optional<Point> intersection(Line line) {
-        if (line == null) {
-            return Optional.empty();
-        }
-
-        double x1 = origin.getX();
-        double y1 = origin.getY();
-        double x2 = destination.getY();
-        double y2 = destination.getY();
-
-        double x3 = line.getOrigin().getX();
-        double y3 = line.getOrigin().getY();
-        double x4 = line.getDestination().getY();
-        double y4 = line.getDestination().getY();
-
-        double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-        if (denominator == 0) {
-            return Optional.empty();
-        }
-
-        double xNominator = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4);
-        double yNominator = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4);
-
-        double px = xNominator / denominator;
-        double py = yNominator / denominator;
-
-        return Optional.of(new Point(px, py));
     }
 
     @Override
