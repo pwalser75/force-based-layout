@@ -41,5 +41,27 @@ public class ShapeTest {
         Shape shape = new BaseShape(location, size);
 
         Assert.assertEquals(new Point(250, 150), shape.getCenter());
+
+        shape.setLocation(new Point(-444, -555));
+        Assert.assertEquals(new Point(-294, -455), shape.getCenter());
+    }
+
+    @Test
+    public void testPoints() {
+
+        Point location = new Point(100, 50);
+        Dimension size = new Dimension(300, 200);
+        Shape shape = new BaseShape(location, size);
+
+        Assert.assertEquals(new Point(100, 50), shape.getP1());
+        Assert.assertEquals(new Point(400, 50), shape.getP2());
+        Assert.assertEquals(new Point(100, 250), shape.getP3());
+        Assert.assertEquals(new Point(400, 250), shape.getP4());
+
+        shape.setLocation(new Point(-444, -555));
+        Assert.assertEquals(new Point(-444, -555), shape.getP1());
+        Assert.assertEquals(new Point(-144, -555), shape.getP2());
+        Assert.assertEquals(new Point(-444, -355), shape.getP3());
+        Assert.assertEquals(new Point(-144, -355), shape.getP4());
     }
 }

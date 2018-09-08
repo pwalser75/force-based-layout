@@ -1,5 +1,6 @@
 package ch.frostnova.force.based.layout.geom;
 
+import ch.frostnova.force.based.layout.util.Lazy;
 import ch.frostnova.util.check.Check;
 
 import java.util.Objects;
@@ -14,10 +15,12 @@ public class Vector {
 
     private final double x;
     private final double y;
+    private final Lazy<Double> length;
 
     public Vector(double x, double y) {
         this.x = x;
         this.y = y;
+        length = new Lazy<>(() -> Math.sqrt(x * x + y * y));
     }
 
     /**
@@ -44,7 +47,7 @@ public class Vector {
      * @return length
      */
     public final double length() {
-        return Math.sqrt(x * x + y * y);
+        return length.get();
     }
 
     /**

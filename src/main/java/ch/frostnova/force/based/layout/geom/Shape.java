@@ -38,4 +38,22 @@ public interface Shape {
     default Point getCenter() {
         return new Point(getLocation().getX() + getSize().getWidth() / 2, getLocation().getY() + getSize().getHeight() / 2);
     }
+
+    default Point getP1() {
+        return new Point(getLocation().getX(), getLocation().getY());
+    }
+
+    default Point getP2() {
+        return new Point(getLocation().getX() + getSize().getWidth(), getLocation().getY());
+    }
+
+    default Point getP3() {
+        return new Point(getLocation().getX(), getLocation().getY() + getSize().getHeight());
+    }
+
+    default Point getP4() {
+        return new Point(getLocation().getX() + getSize().getWidth(), getLocation().getY() + getSize().getHeight());
+    }
+
+
 }
