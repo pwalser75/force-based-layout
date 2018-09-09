@@ -1,6 +1,7 @@
 package ch.frostnova.force.based.layout.render.strategy;
 
 import ch.frostnova.force.based.layout.geom.Dimension;
+import ch.frostnova.force.based.layout.geom.Line;
 import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Shape;
@@ -66,10 +67,31 @@ public class DefaultRenderStrategy implements SceneRenderStrategy {
         Shape from = connector.getFrom();
         Shape to = connector.getTo();
 
-        Point start = from.getBounds().getCenter();
-        Point end = to.getBounds().getCenter();
+        final Point start = from.getBounds().getCenter();
+        final Point end = to.getBounds().getCenter();
 
-        Line2D line = new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY());
+        Line connectorStartEnd = new Line(start, end);
+        Line connectorEndStart = new Line(end, start);
+
+        // find intersections on the two shapes with the connector line
+
+        final Point lineStart = from.getBounds().nearestIntersection(connectorStartEnd).orElse(null);
+        if (lineStart == null) {
+            return;
+        }
+        final Point lineEnd = to.getBounds().nearestIntersection(connectorEndStart).orElse(null);
+        if (lineEnd == null) {
+            return;
+        }
+        // check if reversed vector from start to end
+        double lenght1 = start.distance(lineStart).length();
+        double lenght2 = start.distance(lineEnd).length();
+
+        if (lenght1 >= lenght2) {
+            return;
+        }
+
+        Line2D line = new Line2D.Double(lineStart.getX(), lineStart.getY(), lineEnd.getX(), lineEnd.getY());
 
         g.setColor(connectorColor);
         g.draw(line);
