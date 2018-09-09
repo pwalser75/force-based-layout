@@ -1,5 +1,6 @@
 package ch.frostnova.force.based.layout.render.strategy;
 
+import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Shape;
 
@@ -12,6 +13,16 @@ import java.awt.*;
  * @since 08.09.2018.
  */
 public interface SceneRenderStrategy {
+
+    /**
+     * Render the background
+     *
+     * @param g    graphics context
+     * @param size background size
+     */
+    default void renderBackground(Graphics2D g, Dimension size) {
+
+    }
 
     /**
      * Render the given shape
