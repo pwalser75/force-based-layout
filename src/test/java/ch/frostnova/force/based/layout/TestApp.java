@@ -1,6 +1,7 @@
 package ch.frostnova.force.based.layout;
 
 import ch.frostnova.force.based.layout.model.BaseShape;
+import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.force.based.layout.render.SwingSceneRenderer;
@@ -21,14 +22,13 @@ public class TestApp extends JFrame {
         SwingUtilities.invokeAndWait(TestApp::new);
     }
 
-    private final Scene scene;
-
     private TestApp() {
 
         setTitle("Force Based Layout Test");
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        setSize(new Dimension(screenSize.width / 2, screenSize.height * 2 / 3));
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int size = Math.min(screenSize.width, screenSize.height) * 2 / 3;
+        setSize(size, size);
         setMinimumSize(new Dimension(400, 400));
         centerOnScreen();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,13 +40,34 @@ public class TestApp extends JFrame {
         SwingSceneRenderer sceneRenderer = new SwingSceneRenderer();
         main.add(sceneRenderer, BorderLayout.CENTER);
 
-        scene = new Scene();
-        for (int i = 0; i < 20; i++) {
-            scene.add(randomShape(getSize()));
-        }
+        Scene scene = initScene();
         sceneRenderer.setScene(scene);
 
         setVisible(true);
+    }
+
+    private Scene initScene() {
+        Scene scene = new Scene();
+
+        Shape a = randomShape(getSize());
+        Shape b = randomShape(getSize());
+        Shape c = randomShape(getSize());
+        Shape d = randomShape(getSize());
+        Shape e = randomShape(getSize());
+
+        scene.add(a);
+        scene.add(b);
+        scene.add(c);
+        scene.add(d);
+        scene.add(e);
+
+        scene.add(new Connector(a, b));
+        scene.add(new Connector(a, c));
+        scene.add(new Connector(a, d));
+        scene.add(new Connector(b, d));
+        scene.add(new Connector(b, e));
+        scene.add(new Connector(c, e));
+        return scene;
     }
 
     private void centerOnScreen() {
@@ -58,8 +79,8 @@ public class TestApp extends JFrame {
 
     private Shape randomShape(Dimension area) {
 
-        int w = rnd(10, 200);
-        int h = rnd(10, 200);
+        int w = rnd(100, 300);
+        int h = rnd(100, 300);
         int x = rnd(0, area.width - w);
         int y = rnd(0, area.height - h);
         return new BaseShape(x, y, w, h);

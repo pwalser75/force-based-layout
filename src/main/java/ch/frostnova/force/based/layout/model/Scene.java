@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 public class Scene {
 
     private final Set<Shape> shapes = new HashSet<>();
+    private final Set<Connector> connectors = new HashSet<>();
 
     public void add(Shape shape) {
         Check.required(shape, "shape");
@@ -33,13 +34,34 @@ public class Scene {
         return shape != null & shapes.contains(shape);
     }
 
-    public void clear() {
-        shapes.clear();
-    }
-
     public Stream<Shape> shapes() {
         return shapes.stream();
     }
+
+
+    public void add(Connector connector) {
+        Check.required(connector, "connector");
+        connectors.add(connector);
+    }
+
+    public void remove(Connector connector) {
+        Check.required(connector, "connector");
+        connectors.remove(connector);
+    }
+
+    public boolean contains(Connector connector) {
+        return connector != null & connectors.contains(connector);
+    }
+
+    public Stream<Connector> connectors() {
+        return connectors.stream();
+    }
+
+    public void clear() {
+        shapes.clear();
+        connectors.clear();
+    }
+
 
     public Optional<Shape> getShapeAt(double x, double y) {
 

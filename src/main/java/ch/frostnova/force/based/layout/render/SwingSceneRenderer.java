@@ -3,7 +3,7 @@ package ch.frostnova.force.based.layout.render;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.force.based.layout.render.strategy.DefaultRenderStrategy;
-import ch.frostnova.force.based.layout.render.strategy.ShapeRenderStrategy;
+import ch.frostnova.force.based.layout.render.strategy.SceneRenderStrategy;
 import ch.frostnova.util.check.Check;
 
 import javax.swing.*;
@@ -22,7 +22,7 @@ import java.awt.geom.Rectangle2D;
 public class SwingSceneRenderer extends JPanel {
 
     private final Java2DSceneRenderer sceneRenderer = new Java2DSceneRenderer();
-    private ShapeRenderStrategy renderStrategy = new DefaultRenderStrategy();
+    private SceneRenderStrategy renderStrategy = new DefaultRenderStrategy();
 
     private Scene scene = new Scene();
 
@@ -70,7 +70,7 @@ public class SwingSceneRenderer extends JPanel {
         repaint();
     }
 
-    public void setRenderStrategy(ShapeRenderStrategy shapeRenderStrategy) {
+    public void setRenderStrategy(SceneRenderStrategy shapeRenderStrategy) {
         renderStrategy = Check.required(shapeRenderStrategy, "renderStrategy");
         repaint();
     }
