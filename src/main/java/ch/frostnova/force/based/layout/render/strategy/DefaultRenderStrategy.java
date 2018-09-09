@@ -20,15 +20,17 @@ public class DefaultRenderStrategy implements SceneRenderStrategy {
 
     private final static int GRID_SPACING = 25;
 
-    private Color backgroundColor = new Color(0x163F73);
+    private final Color backgroundColor = new Color(0x163F73);
 
-    private Color baseColor = new Color(0xFFFFFF);
+    private final Color baseColor = new Color(0xFFFFFF);
 
-    private Color shapedColor = new Color(0x44000000 | baseColor.getRGB() & 0xFFFFFF, true);
-    private Color shapeOutlineColor = baseColor;
-    private Color connectorColor = new Color(0xFFFFFF);
-    private Color gridColor = new Color(0x22000000 | baseColor.getRGB() & 0xFFFFFF, true);
+    private final Color shapedColor = new Color(0x44000000 | baseColor.getRGB() & 0xFFFFFF, true);
+    private final Color shapeOutlineColor = baseColor;
+    private final Color connectorColor = new Color(0xFFFFFF);
+    private final Color gridColor = new Color(0x22000000 | baseColor.getRGB() & 0xFFFFFF, true);
 
+    private final Stroke solidStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+    private final Stroke dashedStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[]{4}, 0);
 
     @Override
     public void renderBackground(Graphics2D g, Dimension size) {
@@ -64,22 +66,22 @@ public class DefaultRenderStrategy implements SceneRenderStrategy {
     @Override
     public void render(Graphics2D g, Connector connector) {
 
-        Shape from = connector.getFrom();
-        Shape to = connector.getTo();
+        final Shape from = connector.getFrom();
+        final Shape to = connector.getTo();
 
         final Point start = from.getBounds().getCenter();
         final Point end = to.getBounds().getCenter();
 
-        Line connectorStartEnd = new Line(start, end);
-        Line connectorEndStart = new Line(end, start);
+        final Line connectorStartEnd = new Line(start, end);
+        final Line connectorEndStart = new Line(end, start);
 
         // find intersections on the two shapes with the connector line
 
-        final Point lineStart = from.getBounds().nearestIntersection(connectorStartEnd).orElse(null);
+        final Point lineStart = from.getBounds().nearestIntersection(connectorStartEnd).orElse(start);
         if (lineStart == null) {
             return;
         }
-        final Point lineEnd = to.getBounds().nearestIntersection(connectorEndStart).orElse(null);
+        final Point lineEnd = to.getBounds().nearestIntersection(connectorEndStart).orElse(end);
         if (lineEnd == null) {
             return;
         }
@@ -88,12 +90,21 @@ public class DefaultRenderStrategy implements SceneRenderStrategy {
         double lenght2 = start.distance(lineEnd).length();
 
         if (lenght1 >= lenght2) {
-            return;
+
+            g.setColor(Color.red);
+            g.setStroke(solidStroke);
+            g.draw(new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY()));
+        } else {
+
+            g.setColor(connectorColor);
+            g.setStroke(dashedStroke);
+            g.draw(new Line2D.Double(start.getX(), start.getY(), lineStart.getX(), lineStart.getY()));
+            g.draw(new Line2D.Double(lineEnd.getX(), lineEnd.getY(), end.getX(), end.getY()));
+
+            g.setStroke(solidStroke);
+            g.draw(new Line2D.Double(lineStart.getX(), lineStart.getY(), lineEnd.getX(), lineEnd.getY()));
+
         }
 
-        Line2D line = new Line2D.Double(lineStart.getX(), lineStart.getY(), lineEnd.getX(), lineEnd.getY());
-
-        g.setColor(connectorColor);
-        g.draw(line);
     }
 }
