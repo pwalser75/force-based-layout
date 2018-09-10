@@ -64,6 +64,6 @@ public class Dimension {
 
     @Override
     public String toString() {
-        return width + "x" + height;
+        return Constants.NUMBER_FORMAT.format(width) + "x" + Constants.NUMBER_FORMAT.format(height);
     }
 }

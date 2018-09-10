@@ -2,7 +2,7 @@ package ch.frostnova.force.based.layout.render;
 
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
-import ch.frostnova.force.based.layout.render.strategy.DefaultRenderStrategy;
+import ch.frostnova.force.based.layout.render.strategy.DebugRenderStrategy;
 import ch.frostnova.force.based.layout.render.strategy.SceneRenderStrategy;
 import ch.frostnova.util.check.Check;
 
@@ -21,7 +21,7 @@ import java.awt.event.MouseMotionAdapter;
 public class SwingSceneRenderer extends JPanel {
 
     private final Java2DSceneRenderer sceneRenderer = new Java2DSceneRenderer();
-    private SceneRenderStrategy renderStrategy = new DefaultRenderStrategy();
+    private SceneRenderStrategy renderStrategy = new DebugRenderStrategy();
 
     private Scene scene = new Scene();
 

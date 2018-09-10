@@ -49,11 +49,11 @@ public class TestApp extends JFrame {
     private Scene initScene() {
         Scene scene = new Scene();
 
-        Shape a = randomShape(getSize());
-        Shape b = randomShape(getSize());
-        Shape c = randomShape(getSize());
-        Shape d = randomShape(getSize());
-        Shape e = randomShape(getSize());
+        Shape a = randomShape("A", getSize());
+        Shape b = randomShape("B", getSize());
+        Shape c = randomShape("C", getSize());
+        Shape d = randomShape("D", getSize());
+        Shape e = randomShape("E", getSize());
 
         scene.add(a);
         scene.add(b);
@@ -77,13 +77,13 @@ public class TestApp extends JFrame {
         setLocation(x, y);
     }
 
-    private Shape randomShape(Dimension area) {
+    private Shape randomShape(String identifier, Dimension area) {
 
         int w = rnd(100, 300);
         int h = rnd(100, 300);
         int x = rnd(0, area.width - w);
         int y = rnd(0, area.height - h);
-        return new BaseShape(x, y, w, h);
+        return new BaseShape(identifier, x, y, w, h);
 
     }
 

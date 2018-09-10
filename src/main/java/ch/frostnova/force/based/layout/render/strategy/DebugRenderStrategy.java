@@ -11,12 +11,12 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * Strategy on how to render a shape
+ * Default render strategy, adds visual hints on scene metrics.
  *
  * @author pwalser
  * @since 08.09.2018.
  */
-public class DefaultRenderStrategy implements SceneRenderStrategy {
+public class DebugRenderStrategy implements SceneRenderStrategy {
 
     private final static int GRID_SPACING = 25;
 
@@ -31,6 +31,9 @@ public class DefaultRenderStrategy implements SceneRenderStrategy {
 
     private final Stroke solidStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
     private final Stroke dashedStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[]{4}, 0);
+
+    private final Font identifierFont = new Font("Fira Sans", Font.BOLD, 18);
+    private final Font metricsFont = new Font("Fira Sans", Font.BOLD, 12);
 
     @Override
     public void renderBackground(Graphics2D g, Dimension size) {
@@ -61,6 +64,22 @@ public class DefaultRenderStrategy implements SceneRenderStrategy {
         g.fill(rect);
         g.setColor(shapeOutlineColor);
         g.draw(rect);
+
+        java.awt.Shape originalClip = g.getClip();
+        g.setClip(rect);
+
+        String identifier = shape.getIdentifier().orElse("?");
+        g.setFont(identifierFont);
+        FontMetrics fontMetrics = g.getFontMetrics();
+        g.drawString(identifier, (int) rect.getX() + 4, (int) rect.getY() + fontMetrics.getAscent() + 4);
+
+        String metrics = shape.toString();
+        g.setFont(metricsFont);
+        fontMetrics = g.getFontMetrics();
+        int stringWidth = fontMetrics.stringWidth(metrics);
+        g.drawString(metrics, (int) (rect.getX() + rect.getWidth() - 4 - stringWidth), (int) (rect.getY() + rect.getHeight() - 4 - fontMetrics.getDescent()));
+
+        g.setClip(originalClip);
     }
 
     @Override
@@ -103,8 +122,6 @@ public class DefaultRenderStrategy implements SceneRenderStrategy {
 
             g.setStroke(solidStroke);
             g.draw(new Line2D.Double(lineStart.getX(), lineStart.getY(), lineEnd.getX(), lineEnd.getY()));
-
         }
-
     }
 }

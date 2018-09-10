@@ -4,6 +4,8 @@ import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Rectangle;
 
+import java.util.Optional;
+
 /**
  * A shape in a 2D coordinate system.
  *
@@ -11,6 +13,15 @@ import ch.frostnova.force.based.layout.geom.Rectangle;
  * @since 08.09.2018.
  */
 public interface Shape {
+
+    /**
+     * Optional identifier for the shape
+     *
+     * @return identifier, optional
+     */
+    default Optional<String> getIdentifier() {
+        return Optional.empty();
+    }
 
     /**
      * Current location of the shape

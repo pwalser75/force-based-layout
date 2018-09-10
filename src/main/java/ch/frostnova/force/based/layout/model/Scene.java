@@ -2,6 +2,7 @@ package ch.frostnova.force.based.layout.model;
 
 import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.geom.Point;
+import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.util.check.Check;
 
 import java.util.HashSet;
@@ -87,10 +88,10 @@ public class Scene {
      *
      * @return bounding box
      */
-    public Shape boundingBox() {
+    public Rectangle boundingBox() {
 
         if (shapes.isEmpty()) {
-            return new BaseShape(0, 0, 0, 0);
+            return new Rectangle(0, 0, 0, 0);
         }
 
         double minX = Double.NaN;
@@ -107,6 +108,6 @@ public class Scene {
             minY = Math.min(minX, location.getY());
             maxY = Math.max(maxX, location.getY() + size.getHeight());
         }
-        return new BaseShape(minX, minY, maxX - minX, maxY - minY);
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 }

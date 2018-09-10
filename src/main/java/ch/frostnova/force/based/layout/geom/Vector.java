@@ -113,6 +113,6 @@ public class Vector {
     @Override
     public String toString() {
 
-        return x + "/" + y;
+        return Constants.NUMBER_FORMAT.format(x) + "/" + Constants.NUMBER_FORMAT.format(y);
     }
 }
