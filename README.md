@@ -8,6 +8,8 @@ Force-based layouting of shapes with configurable and extensible strategies.
 
 Intended to be used as a basis for chart generation frameworks.
 
+![Screenshot](screenshot.png)
+
 ## Artefact
 
 To include this project in another:
@@ -35,4 +37,10 @@ with Gradle (default tasks: _clean build_):
 with Maven (default tasks: _clean install_):
 
     mvn
+
+## Run
+
+To run the test application (Java Swing):
+
+    gradle run
 
