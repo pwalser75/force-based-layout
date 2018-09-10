@@ -1,6 +1,5 @@
 package ch.frostnova.force.based.layout.render;
 
-import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.render.strategy.SceneRenderStrategy;
 import ch.frostnova.util.check.Check;
@@ -27,7 +26,7 @@ public class ImageSceneRenderer {
 
         BufferedImage image = new BufferedImage(BufferedImage.TYPE_INT_ARGB, width, height);
         Graphics2D graphics = image.createGraphics();
-        sceneRenderer.render(graphics, new Dimension(width, height), scene, renderStrategy);
+        sceneRenderer.render(graphics, width, height, scene, renderStrategy);
 
         image.flush();
         return image;

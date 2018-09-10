@@ -83,7 +83,7 @@ public class SwingSceneRenderer extends JPanel {
         g.setColor(getBackground());
         g.fillRect(0, 0, size.width, size.height);
 
-        sceneRenderer.render(g2, new ch.frostnova.force.based.layout.geom.Dimension(size.getWidth(), size.getHeight()), scene, renderStrategy);
+        sceneRenderer.render(g2, size.width, size.height, scene, renderStrategy);
     }
 
     @Override
