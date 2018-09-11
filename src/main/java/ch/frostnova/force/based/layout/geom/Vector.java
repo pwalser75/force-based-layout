@@ -80,7 +80,36 @@ public class Vector {
         if (length == 0) {
             return this;
         }
-        return new Vector(x / length, y / length);
+        return scaled(1 / length);
+    }
+
+    /**
+     * Rotate the vector
+     *
+     * @param pivot pivot point to rotate around
+     * @param angle angle (radians) to rotate
+     * @return rotated vector
+     */
+    public final Vector rotate(Vector pivot, double angle) {
+
+        double px = x - pivot.getX();
+        double py = y - pivot.getY();
+        double s = Math.sin(angle);
+        double c = Math.cos(angle);
+
+        double xnew = pivot.getX() + px * c - py * s;
+        double ynew = pivot.getY() + px * s + py * c;
+
+        return new Vector(xnew, ynew);
+    }
+
+    /**
+     * Returns an scaled version of this vector.
+     *
+     * @return scaled vector
+     */
+    public final Vector scaled(double factor) {
+        return new Vector(x * factor, y * factor);
     }
 
     /**
@@ -90,7 +119,7 @@ public class Vector {
      */
     public final Vector add(Vector other) {
         Check.required(other, "other");
-        return new Vector(x + other.getY(), y + other.getY());
+        return new Vector(x + other.getX(), y + other.getY());
     }
 
     @Override

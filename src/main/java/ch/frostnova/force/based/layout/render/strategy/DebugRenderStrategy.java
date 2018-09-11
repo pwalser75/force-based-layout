@@ -2,6 +2,7 @@ package ch.frostnova.force.based.layout.render.strategy;
 
 import ch.frostnova.force.based.layout.geom.Line;
 import ch.frostnova.force.based.layout.geom.Point;
+import ch.frostnova.force.based.layout.geom.Vector;
 import ch.frostnova.force.based.layout.geom.domain.RectanglePairMetrics;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Shape;
@@ -30,11 +31,15 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
     private final Color connectorColor = new Color(0xFFFFFF);
     private final Color gridColor = new Color(0x22000000 | baseColor.getRGB() & 0xFFFFFF, true);
 
-    private final Stroke solidStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+    private final Stroke solidStroke = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
     private final Stroke dashedStroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[]{4}, 0);
 
     private final Font identifierFont = new Font("Fira Sans", Font.BOLD, 18);
     private final Font metricsFont = new Font("Fira Sans", Font.BOLD, 12);
+
+    private final double arrowHeadSize = 16;
+    private final double arrowHeadAngle = 30 * Math.PI / 180;
+
 
     private BufferedImage cachedBackground;
 
@@ -100,8 +105,6 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
     @Override
     public void render(Graphics2D g, Connector connector) {
 
-        debug(connector);
-
         final Shape from = connector.getFrom();
         final Shape to = connector.getTo();
 
@@ -113,11 +116,11 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
 
         // find intersections on the two shapes with the connector line
 
-        final Point lineStart = from.getBounds().nearestIntersection(connectorStartEnd).orElse(start);
+        final Point lineStart = from.getBounds().nearestIntersection(connectorStartEnd).orElse(null);
         if (lineStart == null) {
             return;
         }
-        final Point lineEnd = to.getBounds().nearestIntersection(connectorEndStart).orElse(end);
+        final Point lineEnd = to.getBounds().nearestIntersection(connectorEndStart).orElse(null);
         if (lineEnd == null) {
             return;
         }
@@ -125,12 +128,7 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
         double lenght1 = start.distance(lineStart).length();
         double lenght2 = start.distance(lineEnd).length();
 
-        if (lenght1 >= lenght2) {
-
-            g.setColor(Color.red);
-            g.setStroke(solidStroke);
-            g.draw(new Line2D.Double(start.getX(), start.getY(), end.getX(), end.getY()));
-        } else {
+        if (lenght1 < lenght2) {
             g.setColor(connectorColor);
             g.setStroke(dashedStroke);
             g.draw(new Line2D.Double(start.getX(), start.getY(), lineStart.getX(), lineStart.getY()));
@@ -138,20 +136,28 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
 
             g.setStroke(solidStroke);
             g.draw(new Line2D.Double(lineStart.getX(), lineStart.getY(), lineEnd.getX(), lineEnd.getY()));
+
+            // arrow head
+            Vector v = lineEnd.add(lineEnd.distance(lineStart).normalized().scaled(arrowHeadSize));
+
+            Vector arrowHead1 = v.rotate(lineEnd, arrowHeadAngle);
+            Vector arrowHead2 = v.rotate(lineEnd, -arrowHeadAngle);
+            g.draw(new Line2D.Double(arrowHead1.getX(), arrowHead1.getY(), lineEnd.getX(), lineEnd.getY()));
+            g.draw(new Line2D.Double(arrowHead2.getX(), arrowHead2.getY(), lineEnd.getX(), lineEnd.getY()));
         }
-    }
 
-    private void debug(Connector connector) {
 
-        System.out.println("CONNECTOR: " + connector.getFrom().getIdentifier().orElse("?") + " -> " + connector.getTo().getIdentifier().orElse("?"));
-        System.out.println("- from: " + connector.getFrom());
-        System.out.println("- to: " + connector.getTo());
+        if (connector.getFrom().getIdentifier().map("A"::equals).orElse(false) && connector.getTo().getIdentifier().map("B"::equals).orElse(false)) {
 
-        RectanglePairMetrics metrics = new RectanglePairMetrics(connector.getFrom().getBounds(), connector.getTo().getBounds());
-        System.out.println("- overlap: " + metrics.overlap());
-        System.out.println("- overlap area: " + metrics.overlapArea().orElse(null));
-        System.out.println("- overlap length: " + metrics.overlapLength().orElse(null));
-        System.out.println("- distance: " + metrics.distance().orElse(null));
+            System.out.println("CONNECTOR: " + connector.getFrom().getIdentifier().orElse("?") + " -> " + connector.getTo().getIdentifier().orElse("?"));
+            System.out.println("- from: " + connector.getFrom());
+            System.out.println("- to: " + connector.getTo());
 
+            RectanglePairMetrics metrics = new RectanglePairMetrics(connector.getFrom().getBounds(), connector.getTo().getBounds());
+            System.out.println("- overlap: " + metrics.overlap());
+            System.out.println("- overlap area: " + metrics.overlapArea().orElse(null));
+            System.out.println("- overlap length: " + metrics.overlapLength().orElse(null));
+            System.out.println("- distance: " + metrics.distance().orElse(null));
+        }
     }
 }

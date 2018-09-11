@@ -62,11 +62,12 @@ public class TestApp extends JFrame {
         scene.add(e);
 
         scene.add(new Connector(a, b));
-        //        scene.add(new Connector(a, c));
-        //        scene.add(new Connector(a, d));
-        //        scene.add(new Connector(b, d));
-        //        scene.add(new Connector(b, e));
-        //        scene.add(new Connector(c, e));
+        scene.add(new Connector(a, c));
+        scene.add(new Connector(a, d));
+        scene.add(new Connector(b, d));
+        scene.add(new Connector(b, e));
+        scene.add(new Connector(c, e));
+
         return scene;
     }
 
