@@ -2,7 +2,7 @@ package ch.frostnova.force.based.layout.render.strategy;
 
 import ch.frostnova.force.based.layout.geom.Line;
 import ch.frostnova.force.based.layout.geom.Point;
-import ch.frostnova.force.based.layout.geom.Rectangle;
+import ch.frostnova.force.based.layout.geom.domain.RectanglePairMetrics;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Shape;
 
@@ -147,20 +147,11 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
         System.out.println("- from: " + connector.getFrom());
         System.out.println("- to: " + connector.getTo());
 
-        Rectangle a = connector.getFrom().getBounds();
-        Rectangle b = connector.getTo().getBounds();
+        RectanglePairMetrics metrics = new RectanglePairMetrics(connector.getFrom().getBounds(), connector.getTo().getBounds());
+        System.out.println("- overlap: " + metrics.overlap());
+        System.out.println("- overlap area: " + metrics.overlapArea().orElse(null));
+        System.out.println("- overlap length: " + metrics.overlapLength().orElse(null));
+        System.out.println("- distance: " + metrics.distance().orElse(null));
 
-        double dx1 = a.getLocation().getX() - b.getLocation().getX() - b.getSize().getWidth();
-        double dx2 = b.getLocation().getX() - a.getLocation().getX() - a.getSize().getWidth();
-
-        if (dx1 * dx2 < 0) {
-            double distance = dx2 > 0 ? dx2 : -dx1;
-            System.out.println("- distance X: " + distance);
-        } else {
-            double qx1 = Math.max(a.getLocation().getX(), b.getLocation().getX());
-            double qx2 = Math.min(a.getLocation().getX() + a.getSize().getWidth(), b.getLocation().getX() + b.getSize().getWidth());
-            double overlap = qx2 - qx1;
-            System.out.println("- overlap X: " + overlap);
-        }
     }
 }
