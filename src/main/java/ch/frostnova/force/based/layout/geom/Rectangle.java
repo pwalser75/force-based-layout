@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * An rectangle in a 2D coordinate system, whose axes are aligned with the coordinate system (not rotated).
+ * An rectangle in a 2D coordinate system, whose axes are aligned with the coordinate system (AABB -> axis-aligned bounding box).
  *
  * @author pwalser
  * @since 08.09.2018.
@@ -105,7 +105,6 @@ public class Rectangle {
     public Point getP4() {
         return p4.get();
     }
-
 
     @Override
     public String toString() {
