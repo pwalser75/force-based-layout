@@ -3,6 +3,7 @@ package ch.frostnova.force.based.layout.geom.domain;
 import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.force.based.layout.geom.Vector;
+import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.util.check.Check;
 
 import java.util.Objects;
@@ -14,10 +15,10 @@ import java.util.Optional;
  * @author pwalser
  * @since 11.09.2018
  */
-public class RectanglePairMetrics {
+public class ShapePairMetrics {
 
-    private final Rectangle first;
-    private final Rectangle second;
+    private final Shape first;
+    private final Shape second;
 
     private final Optional<Dimension> overlapArea;
     private final Optional<Vector> distance;
@@ -28,12 +29,12 @@ public class RectanglePairMetrics {
      * @param first
      * @param second
      */
-    public RectanglePairMetrics(Rectangle first, Rectangle second) {
+    public ShapePairMetrics(Shape first, Shape second) {
         this.first = Check.required(first, "first");
         this.second = Check.required(second, "second");
 
-        Rectangle a = first;
-        Rectangle b = second;
+        Rectangle a = first.getBounds();
+        Rectangle b = second.getBounds();
 
         double dx1 = a.getLocation().getX() - b.getLocation().getX() - b.getSize().getWidth();
         double dx2 = b.getLocation().getX() - a.getLocation().getX() - a.getSize().getWidth();
@@ -60,11 +61,11 @@ public class RectanglePairMetrics {
         }
     }
 
-    public Rectangle getFirst() {
+    public Shape getFirst() {
         return first;
     }
 
-    public Rectangle getSecond() {
+    public Shape getSecond() {
         return second;
     }
 
@@ -86,9 +87,13 @@ public class RectanglePairMetrics {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RectanglePairMetrics that = (RectanglePairMetrics) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ShapePairMetrics that = (ShapePairMetrics) o;
         return Objects.equals(first, that.first) &&
                 Objects.equals(second, that.second);
     }

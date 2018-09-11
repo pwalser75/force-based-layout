@@ -11,5 +11,5 @@ import java.text.NumberFormat;
  */
 interface Constants {
 
-    NumberFormat NUMBER_FORMAT = new DecimalFormat("0.#####");
+    NumberFormat NUMBER_FORMAT = new DecimalFormat("0.###");
 }

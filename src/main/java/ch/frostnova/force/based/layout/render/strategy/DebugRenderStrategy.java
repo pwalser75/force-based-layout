@@ -3,7 +3,6 @@ package ch.frostnova.force.based.layout.render.strategy;
 import ch.frostnova.force.based.layout.geom.Line;
 import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Vector;
-import ch.frostnova.force.based.layout.geom.domain.RectanglePairMetrics;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Shape;
 
@@ -146,18 +145,17 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
             g.draw(new Line2D.Double(arrowHead2.getX(), arrowHead2.getY(), lineEnd.getX(), lineEnd.getY()));
         }
 
-
-        if (connector.getFrom().getIdentifier().map("A"::equals).orElse(false) && connector.getTo().getIdentifier().map("B"::equals).orElse(false)) {
-
-            System.out.println("CONNECTOR: " + connector.getFrom().getIdentifier().orElse("?") + " -> " + connector.getTo().getIdentifier().orElse("?"));
-            System.out.println("- from: " + connector.getFrom());
-            System.out.println("- to: " + connector.getTo());
-
-            RectanglePairMetrics metrics = new RectanglePairMetrics(connector.getFrom().getBounds(), connector.getTo().getBounds());
-            System.out.println("- overlap: " + metrics.overlap());
-            System.out.println("- overlap area: " + metrics.overlapArea().orElse(null));
-            System.out.println("- overlap length: " + metrics.overlapLength().orElse(null));
-            System.out.println("- distance: " + metrics.distance().orElse(null));
-        }
+//        if (connector.getFrom().getIdentifier().map("A"::equals).orElse(false) && connector.getTo().getIdentifier().map("B"::equals).orElse(false)) {
+//
+//            System.out.println("CONNECTOR: " + connector.getFrom().getIdentifier().orElse("?") + " -> " + connector.getTo().getIdentifier().orElse("?"));
+//            System.out.println("- from: " + connector.getFrom());
+//            System.out.println("- to: " + connector.getTo());
+//
+//            ShapePairMetrics metrics = new ShapePairMetrics(connector.getFrom().getBounds(), connector.getTo().getBounds());
+//            System.out.println("- overlap: " + metrics.overlap());
+//            System.out.println("- overlap area: " + metrics.overlapArea().orElse(null));
+//            System.out.println("- overlap length: " + metrics.overlapLength().orElse(null));
+//            System.out.println("- distance: " + metrics.distance().orElse(null));
+//        }
     }
 }

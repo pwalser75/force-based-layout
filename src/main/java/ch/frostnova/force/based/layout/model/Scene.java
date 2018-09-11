@@ -94,10 +94,10 @@ public class Scene {
             return new Rectangle(0, 0, 0, 0);
         }
 
-        double minX = Double.NaN;
-        double maxX = Double.NaN;
-        double minY = Double.NaN;
-        double maxY = Double.NaN;
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
 
         for (Shape shape : shapes) {
             Point location = shape.getLocation();
@@ -105,8 +105,8 @@ public class Scene {
 
             minX = Math.min(minX, location.getX());
             maxX = Math.max(maxX, location.getX() + size.getWidth());
-            minY = Math.min(minX, location.getY());
-            maxY = Math.max(maxX, location.getY() + size.getHeight());
+            minY = Math.min(minY, location.getY());
+            maxY = Math.max(maxY, location.getY() + size.getHeight());
         }
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
