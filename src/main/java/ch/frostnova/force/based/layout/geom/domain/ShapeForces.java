@@ -16,8 +16,6 @@ import java.util.function.BiConsumer;
  */
 public class ShapeForces {
 
-    private final static Vector ZERO = new Vector(0, 0);
-
     private final Map<Shape, Vector> shapeForces = new HashMap<>();
 
     /**
@@ -36,7 +34,7 @@ public class ShapeForces {
      */
     public Vector get(Shape shape) {
         Check.required(shape, "shape");
-        return shapeForces.computeIfAbsent(shape, s -> ZERO);
+        return shapeForces.computeIfAbsent(shape, s -> Vector.ZERO);
     }
 
     /**
@@ -56,12 +54,21 @@ public class ShapeForces {
     }
 
     /**
-     * Merge these shape forces with other forces.
+     * Add shape forces
+     *
+     * @param other other shape forces
+     */
+    public void addAll(ShapeForces other) {
+        addAll(other, 1);
+    }
+
+    /**
+     * Add shape forces, scaled by a given factor.
      *
      * @param other  other shape forces
      * @param factor factor applied to the other forces
      */
-    public void merge(ShapeForces other, double factor) {
+    public void addAll(ShapeForces other, double factor) {
         Check.required(other, "other");
         other.forEach((shape, force) -> add(shape, force.scaled(factor)));
     }

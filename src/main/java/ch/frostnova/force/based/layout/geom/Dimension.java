@@ -13,6 +13,11 @@ import java.util.Objects;
  */
 public class Dimension {
 
+    /**
+     * No dimension (no width, no height).
+     */
+    public final static Dimension NONE = new Dimension(0, 0);
+
     private final double width;
     private final double height;
 

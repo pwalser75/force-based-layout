@@ -9,8 +9,9 @@ import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.force.based.layout.render.SwingSceneRenderer;
 import ch.frostnova.force.based.layout.strategy.SceneLayoutStrategy;
-import ch.frostnova.force.based.layout.strategy.impl.CollisionLayoutStrategy;
+import ch.frostnova.force.based.layout.strategy.impl.AttractionLayoutStrategy;
 import ch.frostnova.force.based.layout.strategy.impl.OriginLayoutStrategy;
+import ch.frostnova.force.based.layout.strategy.impl.RepulsionLayoutStrategy;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,8 +38,8 @@ public class TestApp extends JFrame {
     private Thread animationThread;
     private boolean running;
 
-    private static double GENERAL_FORCE_FACTOR_PER_SECOND = 1;
-    private static double MIN_FORCE = 0.05;
+    private static double GENERAL_FORCE_FACTOR_PER_SECOND = 10;
+    private static double MIN_FORCE = 0.1;
 
     private TestApp() {
 
@@ -63,8 +64,9 @@ public class TestApp extends JFrame {
         Scene scene = initScene();
         sceneRenderer.setScene(scene);
 
-        weightedStrategies.put(new OriginLayoutStrategy(), 1d);
-        weightedStrategies.put(new CollisionLayoutStrategy(), 1d);
+        weightedStrategies.put(new OriginLayoutStrategy(new Point(20, 20)), 1d);
+        weightedStrategies.put(new RepulsionLayoutStrategy(25), 0.1d);
+        weightedStrategies.put(new AttractionLayoutStrategy(40), 1d);
 
         setVisible(true);
         toggleAnimation();
@@ -72,7 +74,7 @@ public class TestApp extends JFrame {
 
     private JToolBar createToolbar() {
         JToolBar toolBar = new JToolBar();
-        toolBar.add(createAction("Toggle animation", () -> toggleAnimation()));
+        toolBar.add(createAction("Start/stop animation", () -> toggleAnimation()));
 
         return toolBar;
     }
@@ -93,11 +95,11 @@ public class TestApp extends JFrame {
     private Scene initScene() {
         Scene scene = new Scene();
 
-        Shape a = randomShape("A", getSize());
-        Shape b = randomShape("B", getSize());
-        Shape c = randomShape("C", getSize());
-        Shape d = randomShape("D", getSize());
-        Shape e = randomShape("E", getSize());
+        Shape a = randomShape("A", 100, 300, getSize());
+        Shape b = randomShape("B", 100, 300, getSize());
+        Shape c = randomShape("C", 100, 300, getSize());
+        Shape d = randomShape("D", 100, 300, getSize());
+        Shape e = randomShape("E", 100, 300, getSize());
 
         scene.add(a);
         scene.add(b);
@@ -111,6 +113,10 @@ public class TestApp extends JFrame {
         scene.add(new Connector(b, d));
         scene.add(new Connector(b, e));
         scene.add(new Connector(c, e));
+
+        for (int i = 0; i < 5; i++) {
+            //    scene.add(randomShape("X" + i, 50, 200, getSize()));
+        }
 
         return scene;
     }
@@ -150,7 +156,7 @@ public class TestApp extends JFrame {
                         double weight = weightedStrategies.get(strategy);
 
                         ShapeForces forces = strategy.calculateForces(sceneRenderer.getScene());
-                        effectiveForces.merge(forces, weight);
+                        effectiveForces.addAll(forces, weight);
                     }
 
                     effectiveForces.forEach((shape, shapeForce) -> {
@@ -180,10 +186,10 @@ public class TestApp extends JFrame {
         setLocation(x, y);
     }
 
-    private Shape randomShape(String identifier, Dimension area) {
+    private Shape randomShape(String identifier, int minScale, int maxScale, Dimension area) {
 
-        int w = rnd(100, 300);
-        int h = rnd(100, 300);
+        int w = rnd(minScale, maxScale);
+        int h = rnd(minScale, maxScale);
         int x = rnd(0, area.width - w);
         int y = rnd(0, area.height - h);
         return new BaseShape(identifier, x, y, w, h);

@@ -54,7 +54,7 @@ public class ShapeForcesTest {
         f2.add(s1, new Vector(5, 6));
         f2.add(s3, new Vector(-7, -8));
 
-        f1.merge(f2, 1);
+        f1.addAll(f2, 1);
 
         Assert.assertEquals(new Vector(6, 4), f1.get(s1));
         Assert.assertEquals(new Vector(-3, 4), f1.get(s2));

@@ -2,6 +2,7 @@ package ch.frostnova.force.based.layout.geom;
 
 import ch.frostnova.force.based.layout.util.Lazy;
 import ch.frostnova.util.check.Check;
+import ch.frostnova.util.check.CheckNumber;
 
 import java.util.Optional;
 import java.util.Set;
@@ -9,7 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * An rectangle in a 2D coordinate system, whose axes are aligned with the coordinate system (AABB -> axis-aligned bounding box).
+ * An rectangle in a 2D coordinate system, whose axes are aligned with the coordinate system (AABB -> axis-aligned
+ * bounding box).
  *
  * @author pwalser
  * @since 08.09.2018.
@@ -19,7 +21,7 @@ public class Rectangle {
     private final Point location;
     private final Dimension size;
 
-    private final Lazy<Point> p1, p2, p3, p4, center;
+    private final Lazy<Point> center;
 
     public Rectangle(double width, double height) {
         this(new Dimension(width, height));
@@ -36,10 +38,6 @@ public class Rectangle {
     public Rectangle(Point location, Dimension size) {
         this.location = Check.required(location, "location");
         this.size = Check.required(size, "size");
-        p1 = new Lazy<>(() -> new Point(location.getX(), location.getY()));
-        p2 = new Lazy<>(() -> new Point(location.getX() + size.getWidth(), location.getY()));
-        p3 = new Lazy<>(() -> new Point(location.getX(), location.getY() + getSize().getHeight()));
-        p4 = new Lazy<>(() -> new Point(location.getX() + size.getWidth(), location.getY() + size.getHeight()));
         center = new Lazy<>(() -> new Point(location.getX() + size.getWidth() / 2, location.getY() + size.getHeight() / 2));
     }
 
@@ -70,40 +68,20 @@ public class Rectangle {
         return center.get();
     }
 
-    /**
-     * Upper left corner of the shape
-     *
-     * @return point
-     */
-    public Point getP1() {
-        return p1.get();
-    }
 
     /**
-     * Upper right corner of the shape
+     * Create a new rectangle resulting of adding a margin around the given one.
      *
-     * @return point
+     * @param margin margin, must not be negative
+     * @return rectangle
      */
-    public Point getP2() {
-        return p2.get();
-    }
+    public Rectangle addMargin(double margin) {
+        if (margin == 0) {
+            return this;
+        }
 
-    /**
-     * Lower left corner of the shape
-     *
-     * @return point
-     */
-    public Point getP3() {
-        return p3.get();
-    }
-
-    /**
-     * Lower right corner of the shape
-     *
-     * @return point
-     */
-    public Point getP4() {
-        return p4.get();
+        Check.required(margin, "margin", CheckNumber.min(0));
+        return new Rectangle(getLocation().getX() - margin, getLocation().getY() - margin, getSize().getWidth() + 2 * margin, getSize().getHeight() + 2 * margin);
     }
 
     @Override

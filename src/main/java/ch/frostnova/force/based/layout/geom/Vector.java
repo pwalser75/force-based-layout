@@ -13,6 +13,11 @@ import java.util.Objects;
  */
 public class Vector {
 
+    /**
+     * Zero vector (0/0)
+     */
+    public final static Vector ZERO = new Vector(0, 0);
+
     private final double x;
     private final double y;
     private final Lazy<Double> length;

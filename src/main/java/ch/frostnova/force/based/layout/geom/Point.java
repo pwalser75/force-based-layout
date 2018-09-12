@@ -10,6 +10,11 @@ import ch.frostnova.util.check.Check;
  */
 public class Point extends Vector {
 
+    /**
+     * Origin point (0/0)
+     */
+    public final static Point ORIGIN = new Point(0, 0);
+
     public Point(double x, double y) {
         super(x, y);
     }

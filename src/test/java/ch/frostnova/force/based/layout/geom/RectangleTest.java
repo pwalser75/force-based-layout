@@ -41,17 +41,4 @@ public class RectangleTest {
 
         Assert.assertEquals(new Point(250, 150), rectangle.getCenter());
     }
-
-    @Test
-    public void testPoints() {
-
-        Point location = new Point(100, 50);
-        Dimension size = new Dimension(300, 200);
-        Rectangle rectangle = new Rectangle(location, size);
-
-        Assert.assertEquals(new Point(100, 50), rectangle.getP1());
-        Assert.assertEquals(new Point(400, 50), rectangle.getP2());
-        Assert.assertEquals(new Point(100, 250), rectangle.getP3());
-        Assert.assertEquals(new Point(400, 250), rectangle.getP4());
-    }
 }
