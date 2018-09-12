@@ -1,6 +1,7 @@
 package ch.frostnova.force.based.layout.strategy.impl;
 
 import ch.frostnova.force.based.layout.geom.Vector;
+import ch.frostnova.force.based.layout.geom.domain.ShapeForces;
 import ch.frostnova.force.based.layout.geom.domain.ShapePairMetrics;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
@@ -13,8 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Simple strategy: the bounding box of all shapes is attracted by the coordinate system origin (0/0 -> upper left
- * corner).
+ * Simple strategy: the bounding box of all shapes is attracted by the coordinate system origin (0/0 -> upper left corner).
  *
  * @author pwalser
  * @since 11.09.2018.
@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 public class CollisionLayoutStrategy implements SceneLayoutStrategy {
 
     @Override
-    public Map<Shape, Vector> calculateForces(Scene scene) {
+    public ShapeForces calculateForces(Scene scene) {
 
-        Map<Shape, Vector> forces = new HashMap<>();
+        ShapeForces forces = new ShapeForces();
 
         AtomicInteger index = new AtomicInteger();
         Map<Shape, Integer> indexedShapes = scene.shapes().collect(Collectors.toMap(Function.identity(), x -> index.incrementAndGet()));
@@ -61,8 +61,8 @@ public class CollisionLayoutStrategy implements SceneLayoutStrategy {
 
                 Vector forceA = middle.distance(centerA).normalized().scaled(overlapLength / 2);
                 Vector forceB = middle.distance(centerB).normalized().scaled(overlapLength / 2);
-                forces.put(a, forces.computeIfAbsent(a, x -> new Vector(0, 0)).add(forceA));
-                forces.put(b, forces.computeIfAbsent(b, x -> new Vector(0, 0)).add(forceB));
+                forces.add(a, forceA);
+                forces.add(b, forceB);
             }
         });
         return forces;

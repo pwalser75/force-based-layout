@@ -2,6 +2,7 @@ package ch.frostnova.force.based.layout;
 
 import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Vector;
+import ch.frostnova.force.based.layout.geom.domain.ShapeForces;
 import ch.frostnova.force.based.layout.model.BaseShape;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Scene;
@@ -144,20 +145,15 @@ public class TestApp extends JFrame {
 
                     double generalForceFactor = elapsedSeconds * GENERAL_FORCE_FACTOR_PER_SECOND;
 
-                    Map<Shape, Vector> forces = new HashMap<>();
+                    ShapeForces effectiveForces = new ShapeForces();
                     for (SceneLayoutStrategy strategy : weightedStrategies.keySet()) {
                         double weight = weightedStrategies.get(strategy);
 
-                        Map<Shape, Vector> strategyForces = strategy.calculateForces(sceneRenderer.getScene());
-                        strategyForces.forEach((shape, shapeForce) -> {
-
-                            Vector force = forces.computeIfAbsent(shape, x -> new Vector(0, 0));
-                            force = force.add(shapeForce.scaled(weight));
-                            forces.put(shape, force);
-                        });
+                        ShapeForces forces = strategy.calculateForces(sceneRenderer.getScene());
+                        effectiveForces.merge(forces, weight);
                     }
 
-                    forces.forEach((shape, shapeForce) -> {
+                    effectiveForces.forEach((shape, shapeForce) -> {
                         Vector force = shapeForce.scaled(generalForceFactor);
                         if (force.length() > MIN_FORCE) {
                             shape.setLocation(new Point(shape.getLocation().add(force)));
