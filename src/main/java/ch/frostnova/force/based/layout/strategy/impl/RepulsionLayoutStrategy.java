@@ -46,8 +46,8 @@ public class RepulsionLayoutStrategy implements SceneLayoutStrategy {
                             Vector centerB = b.getBounds().getCenter();
                             Vector middle = centerA.add(centerA.distance(centerB).scaled(0.5));
 
-                            Vector forceA = middle.distance(centerA).normalized().scaled(length / 2);
-                            Vector forceB = middle.distance(centerB).normalized().scaled(length / 2);
+                            Vector forceA = middle.distance(centerA).normalized().scaled(length);
+                            Vector forceB = middle.distance(centerB).normalized().scaled(length);
                             forces.add(a, forceA);
                             forces.add(b, forceB);
                         });

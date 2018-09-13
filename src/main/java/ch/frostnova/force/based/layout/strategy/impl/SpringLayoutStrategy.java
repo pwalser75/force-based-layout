@@ -12,22 +12,23 @@ import ch.frostnova.util.check.CheckNumber;
 import java.util.Optional;
 
 /**
- * Attraction layout strategy: shapes attract each other.
+ * Spring layout strategy: connected shapes are driven by spring forces (attract when expanded, repel when contracted,
+ * linear over distance).
  *
  * @author pwalser
  * @since 11.09.2018.
  */
-public class AttractionLayoutStrategy implements SceneLayoutStrategy {
+public class SpringLayoutStrategy implements SceneLayoutStrategy {
 
-    private final double minDistance;
+    private final double springLength;
 
     /**
-     * Create a new repulsion layout strategy, using the given minimal distance between shapes.
+     * Create a new spring layout strategy, using the given spring length for connected shapes.
      *
-     * @param minDistance minimum distance between shapes, must not be negative
+     * @param springLength minimum distance between shapes, must not be negative
      */
-    public AttractionLayoutStrategy(double minDistance) {
-        this.minDistance = Check.required(minDistance, "minDistance", CheckNumber.min(0));
+    public SpringLayoutStrategy(double springLength) {
+        this.springLength = Check.required(springLength, "springLength", CheckNumber.min(0));
     }
 
     @Override
@@ -35,31 +36,28 @@ public class AttractionLayoutStrategy implements SceneLayoutStrategy {
 
         ShapeForces forces = new ShapeForces();
 
-        scene.shapes().forEach(a ->
-                scene.shapes().forEach(b -> {
+        scene.connectors().forEach(connector -> {
 
-                    if (System.identityHashCode(a) < System.identityHashCode(b)) {
+            Shape a = connector.getFrom();
+            Shape b = connector.getTo();
 
-                        calculateDistance(a, b).ifPresent(distance -> {
+            calculateDistance(a, b).ifPresent(distance -> {
 
-                            if (distance > minDistance) {
 
-                                double delta = distance - minDistance;
-                                double attraction = delta / (1 + delta);
+                Vector centerA = a.getBounds().getCenter();
+                Vector centerB = b.getBounds().getCenter();
+                Vector middle = centerA.add(centerA.distance(centerB).scaled(0.5));
 
-                                Vector centerA = a.getBounds().getCenter();
-                                Vector centerB = b.getBounds().getCenter();
-                                Vector middle = centerA.add(centerA.distance(centerB).scaled(0.5));
+                double attraction = distance - springLength;
 
-                                Vector forceA = centerA.distance(middle).normalized().scaled(attraction / 2);
-                                Vector forceB = centerB.distance(middle).normalized().scaled(attraction / 2);
-                                forces.add(a, forceA);
-                                forces.add(b, forceB);
-                            }
-                        });
-                    }
-                })
-        );
+                Vector forceA = centerA.distance(middle).normalized().scaled(attraction / 2);
+                Vector forceB = centerB.distance(middle).normalized().scaled(attraction / 2);
+                forces.add(a, forceA);
+                forces.add(b, forceB);
+            });
+
+        });
+
         return forces;
     }
 

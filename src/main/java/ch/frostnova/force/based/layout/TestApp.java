@@ -9,9 +9,10 @@ import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.force.based.layout.render.SwingSceneRenderer;
 import ch.frostnova.force.based.layout.strategy.SceneLayoutStrategy;
-import ch.frostnova.force.based.layout.strategy.impl.AttractionLayoutStrategy;
+import ch.frostnova.force.based.layout.strategy.impl.CenterLayoutStrategy;
 import ch.frostnova.force.based.layout.strategy.impl.OriginLayoutStrategy;
 import ch.frostnova.force.based.layout.strategy.impl.RepulsionLayoutStrategy;
+import ch.frostnova.force.based.layout.strategy.impl.SpringLayoutStrategy;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,8 +41,8 @@ public class TestApp extends JFrame {
     private Thread animationThread;
     private boolean running;
 
-    private static double GENERAL_FORCE_FACTOR_PER_SECOND = 10;
-    private static double MIN_FORCE = 0.1;
+    private static double GENERAL_FORCE_FACTOR_PER_SECOND = 5;
+    private static double MIN_FORCE = 0.5;
 
     private long animationStartTime;
 
@@ -75,9 +76,10 @@ public class TestApp extends JFrame {
             }
         });
 
-        weightedStrategies.put(new OriginLayoutStrategy(new Point(20, 20)), 1d);
-        weightedStrategies.put(new RepulsionLayoutStrategy(25), 1d);
-        weightedStrategies.put(new AttractionLayoutStrategy(40), 2d);
+        weightedStrategies.put(new OriginLayoutStrategy(new Point(20, 20)), 10d);
+        weightedStrategies.put(new RepulsionLayoutStrategy(25), 5d);
+        weightedStrategies.put(new CenterLayoutStrategy(), 0.01d);
+        weightedStrategies.put(new SpringLayoutStrategy(50), 2d);
 
         setVisible(true);
         toggleAnimation();
@@ -86,6 +88,7 @@ public class TestApp extends JFrame {
     private JToolBar createToolbar() {
         JToolBar toolBar = new JToolBar();
         toolBar.add(createAction("Start/stop animation", () -> toggleAnimation()));
+        toolBar.add(createAction("Randomize shape positions", () -> randomizeShapePositions()));
 
         return toolBar;
     }
@@ -125,14 +128,25 @@ public class TestApp extends JFrame {
         scene.add(new Connector(b, e));
         scene.add(new Connector(c, e));
 
-        for (int i = 0; i < 5; i++) {
-            //    scene.add(randomShape("X" + i, 50, 200, getSize()));
+        for (int i = 1; i <= 5; i++) {
+            //   scene.add(randomShape("X" + i, 40, 40, getSize()));
         }
 
         return scene;
     }
 
-    private synchronized void toggleAnimation() {
+    private void randomizeShapePositions() {
+
+        sceneRenderer.getScene().shapes().forEach(shape -> {
+            double x = Math.random() * (sceneRenderer.getSize().width - shape.getSize().getWidth());
+            double y = Math.random() * (sceneRenderer.getSize().height - shape.getSize().getHeight());
+            shape.setLocation(new Point(x, y));
+        });
+        animationStartTime = System.nanoTime();
+        sceneRenderer.repaint();
+    }
+
+    private void toggleAnimation() {
 
         if (running) {
             running = false;
@@ -153,10 +167,11 @@ public class TestApp extends JFrame {
                 while (running) {
 
                     try {
-                        Thread.sleep(25);
+                        Thread.sleep(20);
                     } catch (Exception ex) {
                         throw new RuntimeException("Animation terminated", ex);
                     }
+
                     long timestamp = System.nanoTime();
                     double elapsedSeconds = (timestamp - timeLastFrame) * 1e-9;
                     timeLastFrame = timestamp;
@@ -180,7 +195,6 @@ public class TestApp extends JFrame {
 
                     try {
                         SwingUtilities.invokeAndWait(() -> sceneRenderer.repaint());
-                        Thread.sleep(10);
                     } catch (Exception ex) {
                         throw new RuntimeException("Animation terminated", ex);
                     }
@@ -194,7 +208,7 @@ public class TestApp extends JFrame {
     private double getAnimationForceFactor() {
 
         double elapsedSeconds = (System.nanoTime() - animationStartTime) * 1e-9;
-        return GENERAL_FORCE_FACTOR_PER_SECOND / Math.pow(1 + elapsedSeconds, 2);
+        return GENERAL_FORCE_FACTOR_PER_SECOND / Math.pow(1 + 2 * elapsedSeconds, 2);
     }
 
     private void centerOnScreen() {
@@ -214,6 +228,9 @@ public class TestApp extends JFrame {
     }
 
     private int rnd(int min, int bound) {
+        if (min == bound) {
+            return min;
+        }
         return ThreadLocalRandom.current().nextInt(min, bound);
     }
 }

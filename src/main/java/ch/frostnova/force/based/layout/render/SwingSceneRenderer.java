@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.Optional;
 
 /**
  * Java Swing scene renderer
@@ -47,7 +48,7 @@ public class SwingSceneRenderer extends JPanel {
 
                 if (lastMousePosition == null) {
                     selectedShape = scene.getShapeAt(e.getX(), e.getY()).orElse(null);
-                    dragLocation = selectedShape.getLocation();
+                    dragLocation = Optional.ofNullable(selectedShape).map(Shape::getLocation).orElse(null);
                     lastMousePosition = e.getPoint();
                 } else {
                     Point delta = new Point(mousePosition.x - lastMousePosition.x, mousePosition.y - lastMousePosition.y);
