@@ -26,6 +26,7 @@ public class SwingSceneRenderer extends JPanel {
     private Scene scene = new Scene();
 
     private Shape selectedShape;
+    private ch.frostnova.force.based.layout.geom.Point dragLocation;
     private Point lastMousePosition;
 
     public SwingSceneRenderer() {
@@ -46,12 +47,13 @@ public class SwingSceneRenderer extends JPanel {
 
                 if (lastMousePosition == null) {
                     selectedShape = scene.getShapeAt(e.getX(), e.getY()).orElse(null);
+                    dragLocation = selectedShape.getLocation();
                     lastMousePosition = e.getPoint();
                 } else {
                     Point delta = new Point(mousePosition.x - lastMousePosition.x, mousePosition.y - lastMousePosition.y);
                     if (selectedShape != null) {
-                        ch.frostnova.force.based.layout.geom.Point location = selectedShape.getLocation();
-                        selectedShape.setLocation(new ch.frostnova.force.based.layout.geom.Point(location.getX() + delta.getX(), location.getY() + delta.getY()));
+                        dragLocation = new ch.frostnova.force.based.layout.geom.Point(dragLocation.getX() + delta.getX(), dragLocation.getY() + delta.getY());
+                        selectedShape.setLocation(dragLocation);
                         repaint();
                     }
                     lastMousePosition = mousePosition;

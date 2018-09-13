@@ -16,6 +16,8 @@ import ch.frostnova.force.based.layout.strategy.impl.RepulsionLayoutStrategy;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,6 +43,8 @@ public class TestApp extends JFrame {
     private static double GENERAL_FORCE_FACTOR_PER_SECOND = 10;
     private static double MIN_FORCE = 0.1;
 
+    private long animationStartTime;
+
     private TestApp() {
 
         setTitle("Force Based Layout Test");
@@ -64,9 +68,16 @@ public class TestApp extends JFrame {
         Scene scene = initScene();
         sceneRenderer.setScene(scene);
 
+        sceneRenderer.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                animationStartTime = System.nanoTime();
+            }
+        });
+
         weightedStrategies.put(new OriginLayoutStrategy(new Point(20, 20)), 1d);
-        weightedStrategies.put(new RepulsionLayoutStrategy(25), 0.1d);
-        weightedStrategies.put(new AttractionLayoutStrategy(40), 1d);
+        weightedStrategies.put(new RepulsionLayoutStrategy(25), 1d);
+        weightedStrategies.put(new AttractionLayoutStrategy(40), 2d);
 
         setVisible(true);
         toggleAnimation();
@@ -134,6 +145,7 @@ public class TestApp extends JFrame {
             }
         } else {
             running = true;
+            animationStartTime = System.nanoTime();
             animationThread = new Thread(() -> {
 
                 long timeLastFrame = System.nanoTime();
@@ -149,7 +161,7 @@ public class TestApp extends JFrame {
                     double elapsedSeconds = (timestamp - timeLastFrame) * 1e-9;
                     timeLastFrame = timestamp;
 
-                    double generalForceFactor = elapsedSeconds * GENERAL_FORCE_FACTOR_PER_SECOND;
+                    double generalForceFactor = elapsedSeconds * getAnimationForceFactor();
 
                     ShapeForces effectiveForces = new ShapeForces();
                     for (SceneLayoutStrategy strategy : weightedStrategies.keySet()) {
@@ -161,7 +173,7 @@ public class TestApp extends JFrame {
 
                     effectiveForces.forEach((shape, shapeForce) -> {
                         Vector force = shapeForce.scaled(generalForceFactor);
-                        if (force.length() > MIN_FORCE) {
+                        if (force.length() >= MIN_FORCE) {
                             shape.setLocation(new Point(shape.getLocation().add(force)));
                         }
                     });
@@ -177,6 +189,12 @@ public class TestApp extends JFrame {
             animationThread.setDaemon(true);
             animationThread.start();
         }
+    }
+
+    private double getAnimationForceFactor() {
+
+        double elapsedSeconds = (System.nanoTime() - animationStartTime) * 1e-9;
+        return GENERAL_FORCE_FACTOR_PER_SECOND / Math.pow(1 + elapsedSeconds, 2);
     }
 
     private void centerOnScreen() {
