@@ -29,7 +29,7 @@ public class Connector {
     /**
      * Origin of connector
      *
-     * @return from
+     * @return from shape
      */
     public Shape getFrom() {
         return from;
@@ -38,7 +38,7 @@ public class Connector {
     /**
      * Target of connector
      *
-     * @return
+     * @return target shape
      */
     public Shape getTo() {
         return to;

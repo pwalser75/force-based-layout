@@ -9,7 +9,7 @@ import ch.frostnova.force.based.layout.strategy.SceneLayoutStrategy;
 import ch.frostnova.util.check.Check;
 
 /**
- * Simple strategy: the bounding box of all shapes is attracted by the coordinate system origin (0/0 -> upper left
+ * Simple strategy: the bounding box of all shapes is attracted by the coordinate system origin (0/0 is upper left
  * corner).
  *
  * @author pwalser

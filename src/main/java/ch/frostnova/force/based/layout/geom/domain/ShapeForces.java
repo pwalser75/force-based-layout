@@ -20,6 +20,8 @@ public class ShapeForces {
 
     /**
      * Iterate over shape/force pairs
+     *
+     * @param consumer consumer, required
      */
     public void forEach(BiConsumer<Shape, Vector> consumer) {
         Check.required(consumer, "consumer");
@@ -71,5 +73,14 @@ public class ShapeForces {
     public void addAll(ShapeForces other, double factor) {
         Check.required(other, "other");
         other.forEach((shape, force) -> add(shape, force.scaled(factor)));
+    }
+
+    public double getTotalForces() {
+
+        double sum = 0;
+        for (Vector v : shapeForces.values()) {
+            sum += v.length();
+        }
+        return sum;
     }
 }

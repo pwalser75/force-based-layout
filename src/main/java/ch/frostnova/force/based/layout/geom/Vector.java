@@ -111,6 +111,7 @@ public class Vector {
     /**
      * Returns an scaled version of this vector.
      *
+     * @param factor scale factor
      * @return scaled vector
      */
     public final Vector scaled(double factor) {
@@ -120,6 +121,7 @@ public class Vector {
     /**
      * Addition: add the other vector to this and return the result.
      *
+     * @param other vector, required
      * @return this + other vector
      */
     public final Vector add(Vector other) {

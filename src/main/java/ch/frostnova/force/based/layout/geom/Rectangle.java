@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * An rectangle in a 2D coordinate system, whose axes are aligned with the coordinate system (AABB -> axis-aligned
+ * An rectangle in a 2D coordinate system, whose axes are aligned with the coordinate system (AABB,  axis-aligned
  * bounding box).
  *
  * @author pwalser

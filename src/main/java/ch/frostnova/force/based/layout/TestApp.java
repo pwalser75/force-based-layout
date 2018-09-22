@@ -1,5 +1,6 @@
 package ch.frostnova.force.based.layout;
 
+import ch.frostnova.force.based.layout.geom.Constants;
 import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Vector;
 import ch.frostnova.force.based.layout.geom.domain.ShapeForces;
@@ -114,12 +115,14 @@ public class TestApp extends JFrame {
         Shape c = randomShape("C", 100, 300, getSize());
         Shape d = randomShape("D", 100, 300, getSize());
         Shape e = randomShape("E", 100, 300, getSize());
+        Shape f = randomShape("F", 100, 300, getSize());
 
         scene.add(a);
         scene.add(b);
         scene.add(c);
         scene.add(d);
         scene.add(e);
+        scene.add(f);
 
         scene.add(new Connector(a, b));
         scene.add(new Connector(a, c));
@@ -127,6 +130,7 @@ public class TestApp extends JFrame {
         scene.add(new Connector(b, d));
         scene.add(new Connector(b, e));
         scene.add(new Connector(c, e));
+        scene.add(new Connector(f, c));
 
         for (int i = 1; i <= 5; i++) {
             //   scene.add(randomShape("X" + i, 40, 40, getSize()));
@@ -167,7 +171,7 @@ public class TestApp extends JFrame {
                 while (running) {
 
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(50);
                     } catch (Exception ex) {
                         throw new RuntimeException("Animation terminated", ex);
                     }
@@ -185,6 +189,8 @@ public class TestApp extends JFrame {
                         ShapeForces forces = strategy.calculateForces(sceneRenderer.getScene());
                         effectiveForces.addAll(forces, weight);
                     }
+
+                    System.out.println("Total forces: " + Constants.NUMBER_FORMAT.format(effectiveForces.getTotalForces()));
 
                     effectiveForces.forEach((shape, shapeForce) -> {
                         Vector force = shapeForce.scaled(generalForceFactor);

@@ -9,7 +9,7 @@ import java.text.NumberFormat;
  * @author pwalser
  * @since 10.09.2018.
  */
-interface Constants {
+public interface Constants {
 
     NumberFormat NUMBER_FORMAT = new DecimalFormat("0.###");
 }
