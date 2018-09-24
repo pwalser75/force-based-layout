@@ -7,6 +7,7 @@ import ch.frostnova.force.based.layout.util.Lazy;
 import ch.frostnova.util.check.Check;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Basic shape implementation
@@ -22,8 +23,16 @@ public class BaseShape implements Shape {
     private final Optional<String> identifier;
     private final Lazy<Rectangle> bounds;
 
+    public BaseShape(double width, double height) {
+        this(UUID.randomUUID().toString(), new Dimension(width, height));
+    }
+
     public BaseShape(String identifier, double width, double height) {
         this(identifier, new Dimension(width, height));
+    }
+
+    public BaseShape(Dimension size) {
+        this(UUID.randomUUID().toString(), new Point(0, 0), size);
     }
 
     public BaseShape(String identifier, Dimension size) {

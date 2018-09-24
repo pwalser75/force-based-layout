@@ -1,27 +1,20 @@
 package ch.frostnova.force.based.layout;
 
-import ch.frostnova.force.based.layout.geom.Constants;
+import ch.frostnova.force.based.layout.animation.ForceLayoutAnimation;
+import ch.frostnova.force.based.layout.animation.GALayoutAnimation;
+import ch.frostnova.force.based.layout.animation.LayoutAnimation;
 import ch.frostnova.force.based.layout.geom.Point;
-import ch.frostnova.force.based.layout.geom.Vector;
-import ch.frostnova.force.based.layout.geom.domain.ShapeForces;
 import ch.frostnova.force.based.layout.model.BaseShape;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.force.based.layout.render.SwingSceneRenderer;
-import ch.frostnova.force.based.layout.strategy.SceneLayoutStrategy;
-import ch.frostnova.force.based.layout.strategy.impl.CenterLayoutStrategy;
-import ch.frostnova.force.based.layout.strategy.impl.OriginLayoutStrategy;
-import ch.frostnova.force.based.layout.strategy.impl.RepulsionLayoutStrategy;
-import ch.frostnova.force.based.layout.strategy.impl.SpringLayoutStrategy;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -38,14 +31,7 @@ public class TestApp extends JFrame {
     }
 
     private SwingSceneRenderer sceneRenderer = new SwingSceneRenderer();
-    private final Map<SceneLayoutStrategy, Double> weightedStrategies = new HashMap<>();
-    private Thread animationThread;
-    private boolean running;
-
-    private static double GENERAL_FORCE_FACTOR_PER_SECOND = 5;
-    private static double MIN_FORCE = 0.5;
-
-    private long animationStartTime;
+    private volatile AnimationThread animationThread;
 
     private TestApp() {
 
@@ -73,22 +59,18 @@ public class TestApp extends JFrame {
         sceneRenderer.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                animationStartTime = System.nanoTime();
+                stopAnimation();
             }
         });
 
-        weightedStrategies.put(new OriginLayoutStrategy(new Point(20, 20)), 10d);
-        weightedStrategies.put(new RepulsionLayoutStrategy(25), 5d);
-        weightedStrategies.put(new CenterLayoutStrategy(), 0.01d);
-        weightedStrategies.put(new SpringLayoutStrategy(50), 2d);
-
         setVisible(true);
-        toggleAnimation();
     }
 
     private JToolBar createToolbar() {
         JToolBar toolBar = new JToolBar();
-        toolBar.add(createAction("Start/stop animation", () -> toggleAnimation()));
+        toolBar.add(createAction("Force Layout", () -> startAnimation(new ForceLayoutAnimation())));
+        toolBar.add(createAction("GA Layout", () -> startAnimation(new GALayoutAnimation())));
+        toolBar.add(createAction("Stop animation", () -> stopAnimation()));
         toolBar.add(createAction("Randomize shape positions", () -> randomizeShapePositions()));
 
         return toolBar;
@@ -132,10 +114,6 @@ public class TestApp extends JFrame {
         scene.add(new Connector(c, e));
         scene.add(new Connector(f, c));
 
-        for (int i = 1; i <= 5; i++) {
-            //   scene.add(randomShape("X" + i, 40, 40, getSize()));
-        }
-
         return scene;
     }
 
@@ -146,27 +124,43 @@ public class TestApp extends JFrame {
             double y = Math.random() * (sceneRenderer.getSize().height - shape.getSize().getHeight());
             shape.setLocation(new Point(x, y));
         });
-        animationStartTime = System.nanoTime();
         sceneRenderer.repaint();
     }
 
-    private void toggleAnimation() {
+    private boolean isRunning() {
+        return animationThread != null;
+    }
 
-        if (running) {
-            running = false;
-            Thread terminating = animationThread;
-            animationThread = null;
-            try {
-                terminating.join(1000);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException("Failed to terminate animation thread");
-            }
-        } else {
-            running = true;
-            animationStartTime = System.nanoTime();
-            animationThread = new Thread(() -> {
+    private void stopAnimation() {
+        if (!isRunning()) {
+            return;
+        }
+        animationThread.stop();
+    }
+
+    private void startAnimation(LayoutAnimation animation) {
+        stopAnimation();
+        animationThread = new AnimationThread(animation);
+    }
+
+    private class AnimationThread {
+
+        private final LayoutAnimation animation;
+        private boolean running = true;
+        private Thread thread;
+
+        public AnimationThread(LayoutAnimation animation) {
+            this.animation = animation;
+            start();
+        }
+
+        public void start() {
+            stop();
+            thread = new Thread(() -> {
 
                 long timeLastFrame = System.nanoTime();
+
+                long animationStartTime = System.nanoTime();
 
                 while (running) {
 
@@ -177,27 +171,12 @@ public class TestApp extends JFrame {
                     }
 
                     long timestamp = System.nanoTime();
-                    double elapsedSeconds = (timestamp - timeLastFrame) * 1e-9;
+                    double elapsedSeconds = (timestamp - animationStartTime) * 1e-9;
+                    double timeDeltaSec = (timestamp - timeLastFrame) * 1e-9;
                     timeLastFrame = timestamp;
 
-                    double generalForceFactor = elapsedSeconds * getAnimationForceFactor();
-
-                    ShapeForces effectiveForces = new ShapeForces();
-                    for (SceneLayoutStrategy strategy : weightedStrategies.keySet()) {
-                        double weight = weightedStrategies.get(strategy);
-
-                        ShapeForces forces = strategy.calculateForces(sceneRenderer.getScene());
-                        effectiveForces.addAll(forces, weight);
-                    }
-
-                    System.out.println("Total forces: " + Constants.NUMBER_FORMAT.format(effectiveForces.getTotalForces()));
-
-                    effectiveForces.forEach((shape, shapeForce) -> {
-                        Vector force = shapeForce.scaled(generalForceFactor);
-                        if (force.length() >= MIN_FORCE) {
-                            shape.setLocation(new Point(shape.getLocation().add(force)));
-                        }
-                    });
+                    Scene scene = animation.animate(sceneRenderer.getScene(), elapsedSeconds, timeDeltaSec);
+                    sceneRenderer.setScene(scene);
 
                     try {
                         SwingUtilities.invokeAndWait(() -> sceneRenderer.repaint());
@@ -206,15 +185,26 @@ public class TestApp extends JFrame {
                     }
                 }
             });
-            animationThread.setDaemon(true);
-            animationThread.start();
+            running = true;
+            thread.setDaemon(true);
+            thread.start();
         }
-    }
 
-    private double getAnimationForceFactor() {
-
-        double elapsedSeconds = (System.nanoTime() - animationStartTime) * 1e-9;
-        return GENERAL_FORCE_FACTOR_PER_SECOND / Math.pow(1 + 2 * elapsedSeconds, 2);
+        public void stop() {
+            if (!running) {
+                return;
+            }
+            running = false;
+            try {
+                if (thread != null) {
+                    thread.join(1000);
+                }
+            } catch (InterruptedException ex) {
+                throw new RuntimeException("Failed to terminate animation thread");
+            } finally {
+                thread = null;
+            }
+        }
     }
 
     private void centerOnScreen() {

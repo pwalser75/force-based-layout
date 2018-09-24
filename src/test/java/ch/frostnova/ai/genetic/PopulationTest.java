@@ -13,8 +13,8 @@ public class PopulationTest {
 
     @Test
     public void testEvolution() {
-
-        Population<TestGenom> population = new Population<>(50, TestGenom::random, TestFitnessFunctions.approximate(1234.5));
+        RulesOfLife rulesOfLife = RulesOfLife.DEFAULT;
+        Population<TestGenom> population = new Population<>(50, TestGenom::random, TestFitnessFunctions.approximate(1234.5), rulesOfLife);
         System.out.println(population);
 
         int generations = 100;

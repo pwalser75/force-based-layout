@@ -26,6 +26,7 @@ public class Population<G extends Genom<G>> {
     private List<G> population;
     private Map<G, Double> fitness = new HashMap<>();
     private final FitnessFunction<G> fitnessFunction;
+    private final RulesOfLife rulesOfLife;
 
     private final Comparator<G> fitnessComparator = Comparator.comparing(this::fitnessOf).reversed();
 
@@ -39,9 +40,22 @@ public class Population<G extends Genom<G>> {
      * @param fitnessFunction fitness function, required
      */
     public Population(int members, Supplier<G> spawnFunction, FitnessFunction<G> fitnessFunction) {
+        this(members, spawnFunction, fitnessFunction, RulesOfLife.DEFAULT);
+    }
+
+    /**
+     * Seed the population with a number of members.
+     *
+     * @param members         number of members of the population
+     * @param spawnFunction   spawn function to create initial members
+     * @param fitnessFunction fitness function, required
+     * @param rulesOfLife     rules of life, required
+     */
+    public Population(int members, Supplier<G> spawnFunction, FitnessFunction<G> fitnessFunction, RulesOfLife rulesOfLife) {
         Check.required(members, "members", CheckNumber.greaterThan(0));
         Check.required(spawnFunction, "spawnFunction");
         this.fitnessFunction = Check.required(fitnessFunction, "fitnessFunction");
+        this.rulesOfLife = Check.required(rulesOfLife, "rulesOfLife");
 
         population = new ArrayList<>(members);
         while (population.size() < members) {
@@ -62,9 +76,8 @@ public class Population<G extends Genom<G>> {
         List<G> nextGeneration = new ArrayList<>(population.size());
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        int surviving = (int) (0.4 * population.size());
-        int reproducing = (int) (0.7 * population.size());
-
+        int surviving = (int) (rulesOfLife.getSurvivingRate() * population.size());
+        int reproducing = (int) (rulesOfLife.getReproducingRate() * population.size());
 
         // add survivors
         for (int i = 0; i < surviving; i++) {
@@ -75,11 +88,12 @@ public class Population<G extends Genom<G>> {
         while (nextGeneration.size() < population.size()) {
 
             // pick two mates
-            G first = population.get(random.nextInt(0, reproducing));
-            G second = population.get(random.nextInt(0, reproducing));
-
-            G offspring = first.crossover(second).mutate();
-            nextGeneration.add(offspring);
+            G first = population.get(randomGamma(0, reproducing, rulesOfLife.getMatingGamma()));
+            G second = population.get(randomGamma(0, reproducing, rulesOfLife.getMatingGamma()));
+            if (first != second) {
+                G offspring = first.crossover(second).mutate();
+                nextGeneration.add(offspring);
+            }
         }
 
         Map<G, Double> newFitness = new HashMap<>();
@@ -155,5 +169,17 @@ public class Population<G extends Genom<G>> {
         return String.format("Population of %d members, generation #%d, fittest: %s with fitness of %s",
                 population.size(), generation, fittestMember, fitnessOf(fittestMember));
 
+    }
+
+    private double randomGamma(double gamma) {
+        return Math.pow(ThreadLocalRandom.current().nextDouble(), gamma);
+    }
+
+    private int randomGamma(int min, int bound, double gamma) {
+        return (int) (min + (bound - min) * randomGamma(randomGamma(gamma)));
+    }
+
+    private int random(int min, int bound) {
+        return (int) (min + (bound - min) * ThreadLocalRandom.current().nextDouble());
     }
 }

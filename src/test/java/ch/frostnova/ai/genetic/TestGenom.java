@@ -1,6 +1,7 @@
 package ch.frostnova.ai.genetic;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -10,6 +11,8 @@ import java.util.function.Supplier;
  * @since 18.09.2018.
  */
 public class TestGenom implements Genom<TestGenom> {
+    private final static Supplier<Integer> randomDelta = () -> (int) (ThreadLocalRandom.current().nextGaussian() * 3);
+    private final static BiFunction<Integer, Integer, Integer> randomMinMax = (a, b) -> (int) (a + (b - a + 1) * ThreadLocalRandom.current().nextDouble());
 
     final int a, b, c, d;
 
@@ -29,13 +32,12 @@ public class TestGenom implements Genom<TestGenom> {
 
     @Override
     public TestGenom mutate() {
-        Supplier<Integer> randomDelta = () -> (int) (ThreadLocalRandom.current().nextGaussian() * 3);
         return new TestGenom(a + randomDelta.get(), b + randomDelta.get(), c + randomDelta.get(), d + randomDelta.get());
     }
 
     @Override
     public TestGenom crossover(TestGenom other) {
-        return new TestGenom((a + other.a) / 2, (b + other.b) / 2, (c + other.c) / 2, (d + other.d) / 2);
+        return new TestGenom(randomMinMax.apply(a, other.a), randomMinMax.apply(b, other.b), randomMinMax.apply(c, other.c), randomMinMax.apply(d, other.d));
     }
 
     public double getValue() {

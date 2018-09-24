@@ -5,6 +5,7 @@ import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.util.check.Check;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +40,9 @@ public class Scene {
         return shapes.stream();
     }
 
+    public Set<Shape> getShapes() {
+        return Collections.unmodifiableSet(shapes);
+    }
 
     public void add(Connector connector) {
         Check.required(connector, "connector");
