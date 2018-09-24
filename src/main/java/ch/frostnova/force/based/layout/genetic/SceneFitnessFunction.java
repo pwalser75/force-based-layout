@@ -6,6 +6,7 @@ import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.force.based.layout.geom.Vector;
 import ch.frostnova.force.based.layout.model.BaseShape;
+import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.util.check.Check;
@@ -23,6 +24,7 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
     private final List<Dimension> shapeDimensions;
     private int shapeMargin = 10;
+    private int springLength = 50;
 
     public SceneFitnessFunction(List<Dimension> shapeDimensions) {
         this.shapeDimensions = Check.required(shapeDimensions, "shapeDimensions");
@@ -38,6 +40,7 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
             shape.setLocation(shapeLocations.get(i));
             scene.add(shape);
         }
+
         return evaulateFitness(scene);
     }
 
@@ -47,14 +50,14 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
         // distance from origin
 
-        double originDistanceWeight = 10;
+        double originDistanceWeight = 2;
         Rectangle boundingBox = scene.boundingBox();
         cost += Math.abs(boundingBox.getLocation().getX()) * originDistanceWeight;
         cost += Math.abs(boundingBox.getLocation().getY()) * originDistanceWeight;
 
         // margin between shapes
 
-        double overlapWeight = 10;
+        double overlapWeight = 1;
         for (Shape a : scene.getShapes()) {
             for (Shape b : scene.getShapes()) {
                 if (System.identityHashCode(a) < System.identityHashCode(b)) {
@@ -66,6 +69,20 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
                         cost += length * overlapWeight;
                     }
                 }
+            }
+        }
+
+        // spring forces on connectors
+
+        double springWeight = 5;
+        for (Connector connector : scene.getConnectors()) {
+            Shape a = connector.getFrom();
+            Shape b = connector.getTo();
+
+            Optional<Double> optionalDistance = calculateDistance(a, b);
+            if (optionalDistance.isPresent()) {
+                // TODO: connectors are not copied yet into the temporary scene -> should rather clone scene and only set locations
+                cost += Math.abs(optionalDistance.get() - springLength) * springWeight;
             }
         }
 
@@ -92,6 +109,33 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
         if (overlapX > 0 && overlapY > 0) {
             return Optional.of(new Vector(overlapX, overlapY).length());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Double> calculateDistance(Shape first, Shape second) {
+
+        Rectangle a = first.getBounds();
+        Rectangle b = second.getBounds();
+
+        double dx1 = a.getLocation().getX() - b.getLocation().getX() - b.getSize().getWidth();
+        double dx2 = b.getLocation().getX() - a.getLocation().getX() - a.getSize().getWidth();
+
+        double dy1 = a.getLocation().getY() - b.getLocation().getY() - b.getSize().getHeight();
+        double dy2 = b.getLocation().getY() - a.getLocation().getY() - a.getSize().getHeight();
+
+        double qx1 = Math.max(a.getLocation().getX(), b.getLocation().getX());
+        double qx2 = Math.min(a.getLocation().getX() + a.getSize().getWidth(), b.getLocation().getX() + b.getSize().getWidth());
+        double overlapX = qx2 - qx1;
+
+        double qy1 = Math.max(a.getLocation().getY(), b.getLocation().getY());
+        double qy2 = Math.min(a.getLocation().getY() + a.getSize().getHeight(), b.getLocation().getY() + b.getSize().getHeight());
+        double overlapY = qy2 - qy1;
+
+        if (overlapX < 0 || overlapY < 0) {
+            double distanceX = overlapX > 0 ? 0 : (dx2 > 0 ? dx2 : -dx1);
+            double distanceY = overlapY > 0 ? 0 : (dy2 > 0 ? dy2 : -dy1);
+            return Optional.of(new Vector(distanceX, distanceY).length());
         }
         return Optional.empty();
     }

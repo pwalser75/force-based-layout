@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class ForceLayoutAnimation implements LayoutAnimation {
 
-    private static double GENERAL_FORCE_FACTOR_PER_SECOND = 5;
+    private static double GENERAL_FORCE_FACTOR_PER_SECOND = 1;
     private static double MIN_FORCE = 0.5;
 
     private final Map<SceneLayoutStrategy, Double> weightedStrategies = new HashMap<>();

@@ -62,6 +62,10 @@ public class Scene {
         return connectors.stream();
     }
 
+    public Set<Connector> getConnectors() {
+        return Collections.unmodifiableSet(connectors);
+    }
+
     public void clear() {
         shapes.clear();
         connectors.clear();

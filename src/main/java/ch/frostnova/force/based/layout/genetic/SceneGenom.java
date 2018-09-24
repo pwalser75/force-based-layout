@@ -44,8 +44,8 @@ public class SceneGenom implements Genom<SceneGenom> {
         for (Point point : shapeLocations) {
 
             if (ThreadLocalRandom.current().nextDouble() < mutationProbability) {
-                double x = point.getX() + ThreadLocalRandom.current().nextGaussian() * 50;
-                double y = point.getY() + ThreadLocalRandom.current().nextGaussian() * 50;
+                double x = point.getX() + ThreadLocalRandom.current().nextGaussian() * 100;
+                double y = point.getY() + ThreadLocalRandom.current().nextGaussian() * 100;
                 newLocations.add(new Point(x, y));
             } else {
                 newLocations.add(point);
@@ -67,7 +67,7 @@ public class SceneGenom implements Genom<SceneGenom> {
             Point p1 = i1.next();
             Point p2 = i2.next();
             double x = rnd(p1.getX(), p2.getX());
-            double y = rnd(p1.getX(), p2.getX());
+            double y = rnd(p1.getY(), p2.getY());
             newLocations.add(new Point(x, y));
 
         }

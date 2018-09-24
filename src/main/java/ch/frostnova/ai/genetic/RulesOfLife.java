@@ -11,7 +11,7 @@ import ch.frostnova.util.check.CheckNumber;
  */
 public class RulesOfLife {
 
-    public final static RulesOfLife DEFAULT = new RulesOfLife(0.1, 0.5, 0.5);
+    public final static RulesOfLife DEFAULT = new RulesOfLife(0.5, 0.4, 0.75);
 
     private final double survivingRate;
     private final double reproducingRate;
