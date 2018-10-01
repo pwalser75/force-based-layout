@@ -20,7 +20,7 @@ public class GALayoutAnimation implements LayoutAnimation {
             sceneOptimizer = new SceneOptimizer(scene);
         }
 
-        sceneOptimizer.optimize(50);
+        sceneOptimizer.optimize(100);
         System.out.println(sceneOptimizer);
         return sceneOptimizer.getScene();
     }

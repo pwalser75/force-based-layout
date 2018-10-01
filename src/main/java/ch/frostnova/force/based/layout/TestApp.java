@@ -220,7 +220,7 @@ public class TestApp extends JFrame {
         int h = rnd(minScale, maxScale);
         int x = rnd(0, area.width - w);
         int y = rnd(0, area.height - h);
-        return new BaseShape(identifier, x, y, w, h);
+        return new BaseShape(new Point(x, y), new ch.frostnova.force.based.layout.geom.Dimension(w, h)).setIdentifier(identifier);
     }
 
     private int rnd(int min, int bound) {

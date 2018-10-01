@@ -75,7 +75,6 @@ public class Population<G extends Genom<G>> {
 
         List<G> nextGeneration = new ArrayList<>(population.size());
 
-        ThreadLocalRandom random = ThreadLocalRandom.current();
         int surviving = (int) (rulesOfLife.getSurvivingRate() * population.size());
         int reproducing = (int) (rulesOfLife.getReproducingRate() * population.size());
 
@@ -102,6 +101,9 @@ public class Population<G extends Genom<G>> {
         }
         fitness = newFitness;
         population = nextGeneration;
+
+        population.stream().parallel().forEach(genom -> fitnessOf(genom));
+
         population.sort(fitnessComparator);
         generation++;
     }

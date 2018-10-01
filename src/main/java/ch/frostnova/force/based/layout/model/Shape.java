@@ -4,24 +4,20 @@ import ch.frostnova.force.based.layout.geom.Dimension;
 import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Rectangle;
 
-import java.util.Optional;
-
 /**
  * A shape in a 2D coordinate system.
  *
  * @author pwalser
  * @since 08.09.2018.
  */
-public interface Shape {
+public interface Shape extends Cloneable {
 
     /**
-     * Optional identifier for the shape
+     * Identifier for the shape
      *
      * @return identifier, optional
      */
-    default Optional<String> getIdentifier() {
-        return Optional.empty();
-    }
+    String getIdentifier();
 
     /**
      * Current location of the shape
@@ -52,4 +48,11 @@ public interface Shape {
     default Rectangle getBounds() {
         return new Rectangle(getLocation(), getSize());
     }
+
+    /**
+     * Clone the shape
+     *
+     * @return clone
+     */
+    Shape clone();
 }

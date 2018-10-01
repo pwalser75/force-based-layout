@@ -87,14 +87,16 @@ public class DebugRenderStrategy implements SceneRenderStrategy {
         java.awt.Shape originalClip = g.getClip();
         g.setClip(rect);
 
-        String identifier = shape.getIdentifier().orElse("?");
-        g.setFont(identifierFont);
-        FontMetrics fontMetrics = g.getFontMetrics();
-        g.drawString(identifier, (int) rect.getX() + 4, (int) rect.getY() + fontMetrics.getAscent() + 4);
+        String identifier = shape.getIdentifier();
+        if (identifier != null) {
+            g.setFont(identifierFont);
+            FontMetrics fontMetrics = g.getFontMetrics();
+            g.drawString(identifier, (int) rect.getX() + 4, (int) rect.getY() + fontMetrics.getAscent() + 4);
+        }
 
         String metrics = shape.toString();
         g.setFont(metricsFont);
-        fontMetrics = g.getFontMetrics();
+        FontMetrics fontMetrics = g.getFontMetrics();
         int stringWidth = fontMetrics.stringWidth(metrics);
         g.drawString(metrics, (int) (rect.getX() + rect.getWidth() - 4 - stringWidth), (int) (rect.getY() + rect.getHeight() - 4 - fontMetrics.getDescent()));
 

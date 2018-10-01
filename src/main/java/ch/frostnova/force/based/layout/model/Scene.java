@@ -5,10 +5,7 @@ import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.util.check.Check;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -17,7 +14,7 @@ import java.util.stream.Stream;
  * @author pwalser
  * @since 08.09.2018.
  */
-public class Scene {
+public class Scene implements Cloneable {
 
     private final Set<Shape> shapes = new HashSet<>();
     private final Set<Connector> connectors = new HashSet<>();
@@ -117,5 +114,23 @@ public class Scene {
             maxY = Math.max(maxY, location.getY() + size.getHeight());
         }
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    @Override
+    public Scene clone() {
+
+        Map<Shape, Shape> clones = new HashMap<>();
+
+        Scene cloned = new Scene();
+        for (Shape shape : getShapes()) {
+            Shape clone = shape.clone();
+            clones.put(shape, clone);
+            cloned.add(clone);
+        }
+        for (Connector connector : connectors) {
+            Connector clone = new Connector(clones.get(connector.getFrom()), clones.get(connector.getTo()));
+            cloned.add(clone);
+        }
+        return cloned;
     }
 }

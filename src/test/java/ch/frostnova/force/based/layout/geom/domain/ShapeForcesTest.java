@@ -68,7 +68,7 @@ public class ShapeForcesTest {
     private Shape randomShape() {
 
         BiFunction<Double, Double, Double> random = (min, max) -> min + ThreadLocalRandom.current().nextDouble() * (max - min);
-        return new BaseShape(UUID.randomUUID().toString(), random.apply(-100d, 100d), random.apply(-100d, 100d), random.apply(0d, 100d), random.apply(0d,
-                100d));
+        return new BaseShape(random.apply(-100d, 100d), random.apply(-100d, 100d), random.apply(0d, 100d), random.apply(0d,
+                100d)).setIdentifier(UUID.randomUUID().toString());
     }
 }

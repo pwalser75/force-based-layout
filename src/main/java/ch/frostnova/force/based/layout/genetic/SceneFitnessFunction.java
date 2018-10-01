@@ -2,16 +2,12 @@ package ch.frostnova.force.based.layout.genetic;
 
 import ch.frostnova.ai.genetic.FitnessFunction;
 import ch.frostnova.force.based.layout.geom.Dimension;
-import ch.frostnova.force.based.layout.geom.Point;
 import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.force.based.layout.geom.Vector;
-import ch.frostnova.force.based.layout.model.BaseShape;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
-import ch.frostnova.util.check.Check;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,26 +18,16 @@ import java.util.Optional;
  */
 public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
-    private final List<Dimension> shapeDimensions;
-    private int shapeMargin = 10;
+    private int shapeMargin = 25;
     private int springLength = 50;
+    private Dimension offset = new Dimension(20, 20);
 
-    public SceneFitnessFunction(List<Dimension> shapeDimensions) {
-        this.shapeDimensions = Check.required(shapeDimensions, "shapeDimensions");
+    public SceneFitnessFunction() {
     }
 
     @Override
     public double evaluate(SceneGenom genom) {
-
-        Scene scene = new Scene();
-        final List<Point> shapeLocations = genom.getShapeLocations();
-        for (int i = 0; i < shapeDimensions.size(); i++) {
-            BaseShape shape = new BaseShape(shapeDimensions.get(i));
-            shape.setLocation(shapeLocations.get(i));
-            scene.add(shape);
-        }
-
-        return evaulateFitness(scene);
+        return evaulateFitness(genom.getScene());
     }
 
     private double evaulateFitness(Scene scene) {
@@ -52,12 +38,12 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
         double originDistanceWeight = 2;
         Rectangle boundingBox = scene.boundingBox();
-        cost += Math.abs(boundingBox.getLocation().getX()) * originDistanceWeight;
-        cost += Math.abs(boundingBox.getLocation().getY()) * originDistanceWeight;
+        cost += Math.abs(boundingBox.getLocation().getX() - offset.getWidth()) * originDistanceWeight;
+        cost += Math.abs(boundingBox.getLocation().getY() - offset.getHeight()) * originDistanceWeight;
 
         // margin between shapes
 
-        double overlapWeight = 1;
+        double overlapWeight = 5;
         for (Shape a : scene.getShapes()) {
             for (Shape b : scene.getShapes()) {
                 if (System.identityHashCode(a) < System.identityHashCode(b)) {
@@ -74,14 +60,13 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
         // spring forces on connectors
 
-        double springWeight = 5;
+        double springWeight = 1;
         for (Connector connector : scene.getConnectors()) {
             Shape a = connector.getFrom();
             Shape b = connector.getTo();
 
             Optional<Double> optionalDistance = calculateDistance(a, b);
             if (optionalDistance.isPresent()) {
-                // TODO: connectors are not copied yet into the temporary scene -> should rather clone scene and only set locations
                 cost += Math.abs(optionalDistance.get() - springLength) * springWeight;
             }
         }
@@ -90,6 +75,35 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
         cost += Math.abs(boundingBox.getSize().getWidth());
         cost += Math.abs(boundingBox.getSize().getHeight());
+
+        // order of connectors: favour right > down > left > up
+
+        double connectionOrderWeight = 10;
+        for (Connector connector : scene.getConnectors()) {
+            Shape a = connector.getFrom();
+            Shape b = connector.getTo();
+
+            Vector distance = a.getLocation().distance(b.getLocation());
+            if (Math.abs(distance.getX()) > Math.abs(distance.getY())) {
+                // left/right
+                if (distance.getX() < 0) {
+                    // left
+                    cost += connectionOrderWeight / 2;
+                } else {
+                    // right
+                    cost += 0;
+                }
+            } else {
+                // up/down
+                if (distance.getY() < 0) {
+                    // up
+                    cost += connectionOrderWeight;
+                } else {
+                    // down
+                    cost += connectionOrderWeight / 4;
+                }
+            }
+        }
 
         return -cost;
     }

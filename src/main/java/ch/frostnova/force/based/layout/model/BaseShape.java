@@ -6,9 +6,6 @@ import ch.frostnova.force.based.layout.geom.Rectangle;
 import ch.frostnova.force.based.layout.util.Lazy;
 import ch.frostnova.util.check.Check;
 
-import java.util.Optional;
-import java.util.UUID;
-
 /**
  * Basic shape implementation
  *
@@ -20,39 +17,27 @@ public class BaseShape implements Shape {
     private Point location;
     private Dimension size;
 
-    private final Optional<String> identifier;
+    private String identifier;
     private final Lazy<Rectangle> bounds;
 
-    public BaseShape(double width, double height) {
-        this(UUID.randomUUID().toString(), new Dimension(width, height));
+    public BaseShape(double x, double y, double width, double height) {
+        this(new Point(x, y), new Dimension(width, height));
     }
 
-    public BaseShape(String identifier, double width, double height) {
-        this(identifier, new Dimension(width, height));
-    }
-
-    public BaseShape(Dimension size) {
-        this(UUID.randomUUID().toString(), new Point(0, 0), size);
-    }
-
-    public BaseShape(String identifier, Dimension size) {
-        this(identifier, new Point(0, 0), size);
-    }
-
-    public BaseShape(String identifier, double x, double y, double width, double height) {
-        this(identifier, new Point(x, y), new Dimension(width, height));
-    }
-
-    public BaseShape(String identifier, Point location, Dimension size) {
-        this.identifier = Optional.ofNullable(identifier);
+    public BaseShape(Point location, Dimension size) {
         this.location = Check.required(location, "location");
         this.size = Check.required(size, "size");
         bounds = new Lazy<>(() -> Shape.super.getBounds());
     }
 
     @Override
-    public Optional<String> getIdentifier() {
+    public String getIdentifier() {
         return identifier;
+    }
+
+    public BaseShape setIdentifier(String identifier) {
+        this.identifier = identifier;
+        return this;
     }
 
     @Override
@@ -84,5 +69,13 @@ public class BaseShape implements Shape {
     @Override
     public String toString() {
         return getBounds().toString();
+    }
+
+    @Override
+    public BaseShape clone() {
+        BaseShape clone = new BaseShape(getLocation(), getSize());
+        clone.setIdentifier(getIdentifier());
+        return clone;
+
     }
 }
