@@ -92,12 +92,12 @@ public class TestApp extends JFrame {
     private Scene initScene() {
         Scene scene = new Scene();
 
-        Shape a = randomShape("A", 100, 300, getSize());
-        Shape b = randomShape("B", 100, 300, getSize());
-        Shape c = randomShape("C", 100, 300, getSize());
-        Shape d = randomShape("D", 100, 300, getSize());
-        Shape e = randomShape("E", 100, 300, getSize());
-        Shape f = randomShape("F", 100, 300, getSize());
+        Shape a = randomShape("A", 150, 200, getSize());
+        Shape b = randomShape("B", 150, 200, getSize());
+        Shape c = randomShape("C", 150, 200, getSize());
+        Shape d = randomShape("D", 150, 200, getSize());
+        Shape e = randomShape("E", 150, 200, getSize());
+        Shape f = randomShape("F", 150, 200, getSize());
 
         scene.add(a);
         scene.add(b);

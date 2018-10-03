@@ -1,6 +1,7 @@
 package ch.frostnova.force.based.layout.genetic;
 
 import ch.frostnova.ai.genetic.Population;
+import ch.frostnova.ai.genetic.RulesOfLife;
 import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.util.check.Check;
 import ch.frostnova.util.check.CheckNumber;
@@ -10,6 +11,8 @@ import ch.frostnova.util.check.CheckNumber;
  * @since 24.09.2018.
  */
 public class SceneOptimizer {
+
+    private final static RulesOfLife rulesOfLife = new RulesOfLife(0.3, 0.5, 0.75);
 
     private SceneFitnessFunction fitnessFunction;
 
@@ -21,7 +24,7 @@ public class SceneOptimizer {
         Check.required(scene, "scene");
         fitnessFunction = new SceneFitnessFunction();
         numberOfShapes = (int) scene.shapes().count();
-        population = new Population<>(100, () -> new SceneGenom(scene), fitnessFunction);
+        population = new Population<>(100, () -> new SceneGenom(scene), fitnessFunction, rulesOfLife);
     }
 
     public void optimize(int generations) {

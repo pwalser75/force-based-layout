@@ -6,7 +6,9 @@ import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.util.check.Check;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -30,18 +32,33 @@ public class SceneGenom implements Genom<SceneGenom> {
     @Override
     public SceneGenom mutate() {
 
-        double mutationProbability = 0.3;
+        double mutationProbability = 0.2;
+        double mutationStrength = 500 * ThreadLocalRandom.current().nextDouble();
 
         Scene offspring = scene.clone();
 
+        // move shapes
         offspring.shapes().forEach(shape -> {
             if (ThreadLocalRandom.current().nextDouble() < mutationProbability) {
                 Point location = shape.getLocation();
-                double x = location.getX() + ThreadLocalRandom.current().nextGaussian() * 100;
-                double y = location.getY() + ThreadLocalRandom.current().nextGaussian() * 100;
+                double x = location.getX() + ThreadLocalRandom.current().nextGaussian() * mutationStrength;
+                double y = location.getY() + ThreadLocalRandom.current().nextGaussian() * mutationStrength;
                 shape.setLocation(new Point(x, y));
             }
         });
+
+        // swap shape locations
+        if (ThreadLocalRandom.current().nextDouble() < mutationProbability) {
+            List<Shape> shapes = new ArrayList<>(offspring.getShapes());
+            Shape s1 = shapes.get(ThreadLocalRandom.current().nextInt(0, shapes.size()));
+            Shape s2 = shapes.get(ThreadLocalRandom.current().nextInt(0, shapes.size()));
+            if (s1 != s2) {
+                Point temp = s1.getLocation();
+                s1.setLocation(s2.getLocation());
+                s2.setLocation(temp);
+            }
+        }
+
         return new SceneGenom(offspring);
     }
 

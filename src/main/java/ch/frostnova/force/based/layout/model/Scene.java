@@ -16,7 +16,7 @@ import java.util.stream.Stream;
  */
 public class Scene implements Cloneable {
 
-    private final Set<Shape> shapes = new HashSet<>();
+    private final Set<Shape> shapes = new LinkedHashSet<>();
     private final Set<Connector> connectors = new HashSet<>();
 
     public void add(Shape shape) {

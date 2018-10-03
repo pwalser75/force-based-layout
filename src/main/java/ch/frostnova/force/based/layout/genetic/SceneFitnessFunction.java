@@ -9,6 +9,7 @@ import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Fitness function for an optimally layouted scene
@@ -18,8 +19,8 @@ import java.util.Optional;
  */
 public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
-    private int shapeMargin = 25;
-    private int springLength = 50;
+    private int shapeMargin = 50;
+    private int springLength = 25;
     private Dimension offset = new Dimension(20, 20);
 
     public SceneFitnessFunction() {
@@ -36,7 +37,7 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
         // distance from origin
 
-        double originDistanceWeight = 2;
+        double originDistanceWeight = 20;
         Rectangle boundingBox = scene.boundingBox();
         cost += Math.abs(boundingBox.getLocation().getX() - offset.getWidth()) * originDistanceWeight;
         cost += Math.abs(boundingBox.getLocation().getY() - offset.getHeight()) * originDistanceWeight;
@@ -76,33 +77,39 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
         cost += Math.abs(boundingBox.getSize().getWidth());
         cost += Math.abs(boundingBox.getSize().getHeight());
 
-        // order of connectors: favour right > down > left > up
+        // order cost function: favour right > down > left > up
+        Function<Vector, Double> orderCost = distance -> {
 
+            //return (distance.getX() < 0 ? 1.0 : 0.0) + (distance.getY() < 0 ? 2.0 : 0.0);
+
+            if (Math.abs(distance.getX()) > Math.abs(distance.getY())) {
+                // left/right
+                return (distance.getX() < 0) ? 1.0 : 0.0;
+            } else {
+                // up/down
+                return (distance.getY() < 0) ? 2.0 : 0.0;
+            }
+        };
+
+        // order cost of shape order in scene
+        double shapeOrderWeight = 20;
+        Shape previous = null;
+        for (Shape shape : scene.getShapes()) {
+            if (previous != null) {
+                Vector distance = previous.getBounds().getCenter().distance(shape.getBounds().getCenter());
+                cost += orderCost.apply(distance) * shapeOrderWeight;
+            }
+            previous = shape;
+        }
+
+        // order cost of connector directions
         double connectionOrderWeight = 10;
         for (Connector connector : scene.getConnectors()) {
             Shape a = connector.getFrom();
             Shape b = connector.getTo();
 
-            Vector distance = a.getLocation().distance(b.getLocation());
-            if (Math.abs(distance.getX()) > Math.abs(distance.getY())) {
-                // left/right
-                if (distance.getX() < 0) {
-                    // left
-                    cost += connectionOrderWeight / 2;
-                } else {
-                    // right
-                    cost += 0;
-                }
-            } else {
-                // up/down
-                if (distance.getY() < 0) {
-                    // up
-                    cost += connectionOrderWeight;
-                } else {
-                    // down
-                    cost += connectionOrderWeight / 4;
-                }
-            }
+            Vector distance = a.getBounds().getCenter().distance(b.getBounds().getCenter());
+            cost += orderCost.apply(distance) * connectionOrderWeight;
         }
 
         return -cost;
