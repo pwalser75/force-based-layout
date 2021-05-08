@@ -4,7 +4,11 @@ import ch.frostnova.util.check.Check;
 import ch.frostnova.util.check.CheckNumber;
 import ch.frostnova.util.check.Verify;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 

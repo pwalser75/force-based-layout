@@ -12,7 +12,7 @@ import ch.frostnova.util.check.CheckNumber;
  */
 public class SceneOptimizer {
 
-    private final static RulesOfLife rulesOfLife = new RulesOfLife(0.3, 0.5, 0.75);
+    private final static RulesOfLife rulesOfLife = new RulesOfLife(0.5, 0.5, 0.75);
 
     private SceneFitnessFunction fitnessFunction;
 

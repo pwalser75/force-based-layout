@@ -3,7 +3,7 @@ package ch.frostnova.force.based.layout.render.strategy;
 import ch.frostnova.force.based.layout.model.Connector;
 import ch.frostnova.force.based.layout.model.Shape;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 
 /**
  * Strategy on how to render a shape

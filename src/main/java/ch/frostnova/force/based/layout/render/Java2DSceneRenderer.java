@@ -5,7 +5,8 @@ import ch.frostnova.force.based.layout.render.strategy.SceneRenderStrategy;
 import ch.frostnova.util.check.Check;
 import ch.frostnova.util.check.CheckNumber;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 
 /**

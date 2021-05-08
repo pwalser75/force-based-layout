@@ -37,14 +37,14 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
         // distance from origin
 
-        double originDistanceWeight = 20;
+        double originDistanceWeight = 1000;
         Rectangle boundingBox = scene.boundingBox();
         cost += Math.abs(boundingBox.getLocation().getX() - offset.getWidth()) * originDistanceWeight;
         cost += Math.abs(boundingBox.getLocation().getY() - offset.getHeight()) * originDistanceWeight;
 
         // margin between shapes
 
-        double overlapWeight = 5;
+        double overlapWeight = 1000;
         for (Shape a : scene.getShapes()) {
             for (Shape b : scene.getShapes()) {
                 if (System.identityHashCode(a) < System.identityHashCode(b)) {
@@ -68,7 +68,7 @@ public class SceneFitnessFunction implements FitnessFunction<SceneGenom> {
 
             Optional<Double> optionalDistance = calculateDistance(a, b);
             if (optionalDistance.isPresent()) {
-                cost += Math.abs(optionalDistance.get() - springLength) * springWeight;
+                cost += Math.pow(Math.abs(optionalDistance.get() - springLength) * springWeight, 1.5);
             }
         }
 

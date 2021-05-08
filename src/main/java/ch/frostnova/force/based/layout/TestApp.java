@@ -10,11 +10,21 @@ import ch.frostnova.force.based.layout.model.Scene;
 import ch.frostnova.force.based.layout.model.Shape;
 import ch.frostnova.force.based.layout.render.SwingSceneRenderer;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -92,19 +102,15 @@ public class TestApp extends JFrame {
     private Scene initScene() {
         Scene scene = new Scene();
 
-        Shape a = randomShape("A", 150, 200, getSize());
-        Shape b = randomShape("B", 150, 200, getSize());
-        Shape c = randomShape("C", 150, 200, getSize());
-        Shape d = randomShape("D", 150, 200, getSize());
-        Shape e = randomShape("E", 150, 200, getSize());
-        Shape f = randomShape("F", 150, 200, getSize());
+        Shape a = randomShape("A", 100, 200, getSize());
+        Shape b = randomShape("B", 100, 200, getSize());
+        Shape c = randomShape("C", 100, 200, getSize());
+        Shape d = randomShape("D", 100, 200, getSize());
+        Shape e = randomShape("E", 100, 200, getSize());
+        Shape f = randomShape("F", 100, 200, getSize());
 
-        scene.add(a);
-        scene.add(b);
-        scene.add(c);
-        scene.add(d);
-        scene.add(e);
-        scene.add(f);
+        List<Shape> shapes = Arrays.asList(a, b, c, d, e, f);
+        shapes.forEach(scene::add);
 
         scene.add(new Connector(a, b));
         scene.add(new Connector(a, c));
@@ -113,6 +119,14 @@ public class TestApp extends JFrame {
         scene.add(new Connector(b, e));
         scene.add(new Connector(c, e));
         scene.add(new Connector(f, c));
+
+        int additionalShapes= 0;
+        for (int i = 1; i <= additionalShapes; i++) {
+            Shape s = randomShape("S" + i, 20, 150, getSize());
+            scene.add(s);
+            Shape link = scene.shapes().skip((int) (Math.random() * shapes.size())).findFirst().orElseThrow(IllegalStateException::new);
+            scene.add(new Connector(link, s));
+        }
 
         return scene;
     }

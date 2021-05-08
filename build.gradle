@@ -1,83 +1,59 @@
-defaultTasks 'clean', 'build'
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
-    }
+plugins {
+    id 'java'
+    id "application"
+    id 'com.github.ben-manes.versions' version '0.38.0'
 }
+apply plugin : "java"
 
-apply plugin: 'java'
-apply plugin:'application'
-apply plugin: 'com.github.ben-manes.versions'
+defaultTasks 'clean', 'build'
 
 description = 'Force Based Layout'
 group = 'ch.frostnova'
 version = '1.0.0-SNAPSHOT'
 
-mainClassName = "ch.frostnova.force.based.layout.TestApp"
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 repositories {
     jcenter()
 }
 
-compileJava.options.encoding = 'UTF-8'
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+ext {
+    javaMainClass = "ch.frostnova.force.based.layout.TestApp"
+}
+application {
+    mainClassName = javaMainClass
 }
 
-def dateTimeFormat = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-def buildDate = java.time.LocalDateTime.now()
+def isNonStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
 
-jar {
-    manifest {
-        attributes(
-                "Name": project.name,
-                "Version": project.version,
-                "Build-Date": dateTimeFormat.format(buildDate)
-        )
+dependencyUpdates {
+    rejectVersionIf {
+        isNonStable(it.candidate.version)
     }
 }
-
-dependencyUpdates.resolutionStrategy = {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
-    }
-}
-
 
 ext.libs = [
         testbase: [
-                "junit:junit:4.12",
-                "org.mockito:mockito-core:2.18.0"
+                "junit:junit:4.13.2",
+                "org.mockito:mockito-core:3.8.0"
         ],
         loggingAPI   : [
-                "org.slf4j:slf4j-api:1.7.25"
+                "org.slf4j:slf4j-api:1.7.30"
         ],
         loggingImpl  : [
-                "org.slf4j:jcl-over-slf4j:1.7.25",
-                "org.slf4j:jul-to-slf4j:1.7.25",
+                "org.slf4j:jcl-over-slf4j:1.7.30",
+                "org.slf4j:jul-to-slf4j:1.7.30",
                 "ch.qos.logback:logback-classic:1.2.3"
         ],
         check: "ch.frostnova:check:1.0.0"
 ]
 
 dependencies {
-    compile libs.check
-    compile libs.loggingAPI
-    compile libs.loggingImpl
+    implementation libs.check
+    implementation libs.loggingAPI
+    implementation libs.loggingImpl
 
-    testCompile libs.testbase
+    testImplementation libs.testbase
 }
